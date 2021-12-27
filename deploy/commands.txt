@@ -1,0 +1,4 @@
+echo $MALINKA_PASS | sudo -S systemctl stop term-status
+rm /drives/Media1/terminal-status/terminal-status.jar
+mv -v /drives/Media1/terminal-status/terminal-status_replace.jar /drives/Media1/terminal-status/terminal-status.jar
+echo $MALINKA_PASS | sudo -S systemctl start term-status
