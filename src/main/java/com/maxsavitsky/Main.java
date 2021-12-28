@@ -1,14 +1,11 @@
 package com.maxsavitsky;
 
-import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.maxsavitsky.sections.MessagesSection;
 import com.maxsavitsky.sections.SystemStatusSection;
 import com.maxsavitsky.tasks.SystemStatTask;
-import com.maxsavitsky.tasks.Task;
 import com.maxsavitsky.tasks.TaskManager;
 import com.maxsavitsky.tasks.TempControlTask;
 import org.apache.commons.lang3.SystemUtils;
@@ -19,9 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Main {
 
@@ -69,28 +63,6 @@ public class Main {
 		if(SystemUtils.IS_OS_LINUX){
 			TaskManager.getInstance().schedule(TempControlTask.TIMER_PERIOD, new TempControlTask());
 		}
-
-		new Thread(()->{
-			while(!Thread.currentThread().isInterrupted()) {
-				try {
-					KeyStroke keyStroke = terminal.pollInput();
-					if (keyStroke != null) {
-						if (keyStroke.isCtrlDown()
-								&& keyStroke.getKeyType() == KeyType.Character
-								&& keyStroke.getCharacter() == 'c') {
-							System.exit(0);
-						}
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				try {
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}).start();
 	}
 
 }
