@@ -47,11 +47,6 @@ public class MessagesController {
 		String label = null;
 		String secId = null;
 
-		try {
-			MessagesSection.getInstance().write(new Line(null, "Received message " + message), terminal);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		System.out.println("Received message " + message);
 
 		String[] ss = message.split("~#");

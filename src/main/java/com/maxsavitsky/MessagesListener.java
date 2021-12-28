@@ -39,7 +39,9 @@ public class MessagesListener {
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
-			System.out.println("Socket started after " + (System.currentTimeMillis() - Main.startTime)/1000.0 + " seconds");
+			String msg = "Socket started after " + (System.currentTimeMillis() - Main.startTime)/1000.0 + " seconds";
+			System.out.println(msg);
+			addToBuffer("tag=t~#sec=msg~#msg=" + msg);
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
 

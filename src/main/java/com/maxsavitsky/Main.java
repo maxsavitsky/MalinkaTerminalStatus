@@ -51,7 +51,12 @@ public class Main {
 		MessagesController.addSection(MessagesSection.getInstance());
 		MessagesController.start(terminal);
 
-		System.out.println("Messages controller start listening after " + (System.currentTimeMillis() - startTime)/1000.0 + " seconds");
+		String msg = "Messages controller started after " + (System.currentTimeMillis() - startTime)/1000.0 + " seconds";
+		System.out.println(msg);
+		MessagesSection.getInstance().write(
+				new Line("t", "msg", msg),
+				terminal
+		);
 
 		ArrayList<Task> tasks = new ArrayList<>();
 		tasks.add(new SystemStatTask());
