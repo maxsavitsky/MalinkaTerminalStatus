@@ -22,7 +22,7 @@ import java.util.TimerTask;
 
 public class Main {
 
-	private static final long TIMER_PERIOD = 5000;
+	private static final long TIMER_PERIOD = 15000;
 
 	public static long startTime;
 
