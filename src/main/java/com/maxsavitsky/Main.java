@@ -9,6 +9,9 @@ import com.maxsavitsky.sections.MessagesSection;
 import com.maxsavitsky.sections.SystemStatusSection;
 import com.maxsavitsky.tasks.SystemStatTask;
 import com.maxsavitsky.tasks.Task;
+import com.maxsavitsky.tasks.TaskManager;
+import com.maxsavitsky.tasks.TempControlTask;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,8 +24,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main {
-
-	private static final long TIMER_PERIOD = 15000;
 
 	public static long startTime;
 
@@ -58,22 +59,16 @@ public class Main {
 				terminal
 		);
 
-		ArrayList<Task> tasks = new ArrayList<>();
-		tasks.add(new SystemStatTask());
+		MessagesSection.getInstance().write(
+				new Line("t", "msg", "Started as " + Utils.exec("whoami")),
+				terminal
+		);
 
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				for(Task t : tasks){
-					try {
-						t.execute();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}, 2000, TIMER_PERIOD);
+		TaskManager.getInstance().schedule(SystemStatTask.TIMER_PERIOD, new SystemStatTask());
+
+		if(SystemUtils.IS_OS_LINUX){
+			TaskManager.getInstance().schedule(TempControlTask.TIMER_PERIOD, new TempControlTask());
+		}
 
 		new Thread(()->{
 			while(!Thread.currentThread().isInterrupted()) {

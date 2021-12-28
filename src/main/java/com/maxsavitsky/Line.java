@@ -2,6 +2,8 @@ package com.maxsavitsky;
 
 public class Line {
 
+	public static final String delimiter = "~#";
+
 	private final String tag, sectionId;
 	private String message, label;
 	private final long time;
@@ -48,6 +50,20 @@ public class Line {
 
 	public String getLabel() {
 		return label;
+	}
+
+	public String format(){
+		String s = "";
+		if(tag != null)
+			s += "tag=" + tag + delimiter;
+		if(label != null)
+			s += "lbl=" + label + delimiter;
+		if(message != null)
+			s += "msg=" + message + delimiter;
+		if(sectionId != null)
+			s += "sec=" + sectionId + delimiter;
+		s = s.substring(0, s.length() - delimiter.length());
+		return s;
 	}
 
 	@Override

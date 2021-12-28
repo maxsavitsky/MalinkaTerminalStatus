@@ -50,8 +50,7 @@ public class MessagesListener {
 						String s;
 						while ((s = reader.readLine()) != null) {
 							addToBuffer(s);
-							for(var l : listenerCallbacks)
-								l.onMessage(s);
+							handle(s);
 						}
 					}
 				} catch (IOException e) {
@@ -75,6 +74,11 @@ public class MessagesListener {
 	public void fetchBuffer(ListenerCallback callback){
 		for(String s : buffer)
 			callback.onMessage(s);
+	}
+
+	public void handle(String s){
+		for(var l : listenerCallbacks)
+			l.onMessage(s);
 	}
 
 }

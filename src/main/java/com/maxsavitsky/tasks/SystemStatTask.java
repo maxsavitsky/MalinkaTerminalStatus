@@ -2,29 +2,24 @@ package com.maxsavitsky.tasks;
 
 import com.maxsavitsky.Line;
 import com.maxsavitsky.MessagesController;
+import com.maxsavitsky.Utils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
-import java.util.Properties;
 
 public class SystemStatTask extends Task {
+
+	public static final long TIMER_PERIOD = 15000;
 
 	private final com.sun.management.OperatingSystemMXBean osBean;
 	private final Runtime runtime;
 
-	public SystemStatTask(){
+	public SystemStatTask() {
 		runtime = Runtime.getRuntime();
 		osBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-	}
-
-	private String execLinuxCommand(String cmd) throws IOException {
-		Process process = runtime.exec(cmd);
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		process.getInputStream().transferTo(bos);
-		return bos.toString();
 	}
 
 	@Override
@@ -34,7 +29,7 @@ public class SystemStatTask extends Task {
 				new Line(
 						"cpu",
 						"sys-stat",
-						(int)(osBean.getCpuLoad() * 100) + "%",
+						(int) (osBean.getCpuLoad() * 100) + "%",
 						"Cpu usage"
 				)
 		);
@@ -44,8 +39,8 @@ public class SystemStatTask extends Task {
 						"RAM usage"
 				)
 		);
-		if(SystemUtils.IS_OS_LINUX){
-			String result = execLinuxCommand("vcgencmd measure_temp"); // temp=XX'C
+		if (SystemUtils.IS_OS_LINUX) {
+			String result = Utils.exec("vcgencmd measure_temp"); // temp=XX'C
 			String temp = result.substring("temp=".length());
 			lines.add(
 					new Line("Temp", "sys-stat", temp, "Temp")
@@ -67,13 +62,13 @@ public class SystemStatTask extends Task {
 					"nginx",
 					"mysql"
 			};
-			for(int i = 0; i < services.length; i++){
-				String state = execLinuxCommand("systemctl is-active " + services[i]);
+			for (int i = 0; i < services.length; i++) {
+				String state = Utils.exec("systemctl is-active " + services[i]);
 				lines.add(new Line(services[i], "sys-stat", state, servicesNames[i]));
 			}
 		}
 
-		for(var l : lines){
+		for (var l : lines) {
 			try {
 				MessagesController.handle(l);
 			} catch (IOException e) {
