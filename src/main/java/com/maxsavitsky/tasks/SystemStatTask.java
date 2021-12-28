@@ -29,7 +29,7 @@ public class SystemStatTask extends Task {
 						"cpu",
 						"sys-stat",
 						(int) (osBean.getCpuLoad() * 100) + "%",
-						"Cpu usage"
+						"CPU usage"
 				)
 		);
 		lines.add(
@@ -51,7 +51,10 @@ public class SystemStatTask extends Task {
 					"mstdrive",
 					"gitea",
 					"nginx",
-					"mysql"
+					"mysql",
+					"postfix",
+					"dovecot",
+					"clamav-daemon"
 			};
 			String[] servicesNames = new String[]{
 					"Site",
@@ -59,7 +62,10 @@ public class SystemStatTask extends Task {
 					"Drive",
 					"Gitea",
 					"nginx",
-					"mysql"
+					"mysql",
+					"Postfix",
+					"Dovecot",
+					"ClamAV"
 			};
 			for (int i = 0; i < services.length; i++) {
 				String state = Utils.exec("systemctl is-active " + services[i]);
