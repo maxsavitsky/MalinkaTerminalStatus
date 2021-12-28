@@ -10,26 +10,10 @@ import java.util.ArrayList;
 public class MessagesListener {
 
 	private static final int BUFFER_MAX_SIZE = 100;
-
-	public interface ListenerCallback {
-		void onMessage(String s);
-	}
-
 	private static final MessagesListener instance = new MessagesListener();
-
-	public static MessagesListener getInstance() {
-		return instance;
-	}
-
-	private ServerSocket serverSocket;
-
 	private final ArrayList<String> buffer = new ArrayList<>();
-
 	private final ArrayList<ListenerCallback> listenerCallbacks = new ArrayList<>();
-
-	public void addListener(ListenerCallback callback) {
-		listenerCallbacks.add(callback);
-	}
+	private ServerSocket serverSocket;
 
 	private MessagesListener() {
 		new Thread(() -> {
@@ -39,7 +23,7 @@ public class MessagesListener {
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
-			String msg = "Socket started after " + (System.currentTimeMillis() - Main.startTime)/1000.0 + " seconds";
+			String msg = "Socket started after " + (System.currentTimeMillis() - Main.startTime) / 1000.0 + " seconds";
 			System.out.println(msg);
 			addToBuffer("tag=t~#sec=msg~#msg=" + msg);
 			while (!Thread.currentThread().isInterrupted()) {
@@ -61,6 +45,14 @@ public class MessagesListener {
 		}).start();
 	}
 
+	public static MessagesListener getInstance() {
+		return instance;
+	}
+
+	public void addListener(ListenerCallback callback) {
+		listenerCallbacks.add(callback);
+	}
+
 	private void addToBuffer(String s) {
 		buffer.add(s);
 		while (buffer.size() > BUFFER_MAX_SIZE)
@@ -71,14 +63,18 @@ public class MessagesListener {
 		return new ArrayList<>(buffer);
 	}
 
-	public void fetchBuffer(ListenerCallback callback){
-		for(String s : buffer)
+	public void fetchBuffer(ListenerCallback callback) {
+		for (String s : buffer)
 			callback.onMessage(s);
 	}
 
-	public void handle(String s){
-		for(var l : listenerCallbacks)
+	public void handle(String s) {
+		for (var l : listenerCallbacks)
 			l.onMessage(s);
+	}
+
+	public interface ListenerCallback {
+		void onMessage(String s);
 	}
 
 }

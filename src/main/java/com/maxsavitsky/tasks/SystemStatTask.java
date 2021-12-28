@@ -5,7 +5,6 @@ import com.maxsavitsky.MessagesController;
 import com.maxsavitsky.Utils;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;

@@ -5,14 +5,14 @@ public class Line {
 	public static final String delimiter = "~#";
 
 	private final String tag, sectionId;
-	private String message, label;
 	private final long time;
+	private String message, label;
 
 	public Line(String tag, String sectionId) {
 		this(tag, sectionId, null, null);
 	}
 
-	public Line(String tag, String sectionId, String message){
+	public Line(String tag, String sectionId, String message) {
 		this(tag, sectionId, message, null);
 	}
 
@@ -36,31 +36,31 @@ public class Line {
 		return time;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
 	public String getMessage() {
 		return message;
 	}
 
-	public void setLabel(String label) {
-		this.label = label;
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 	public String getLabel() {
 		return label;
 	}
 
-	public String format(){
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public String format() {
 		String s = "";
-		if(tag != null)
+		if (tag != null)
 			s += "tag=" + tag + delimiter;
-		if(label != null)
+		if (label != null)
 			s += "lbl=" + label + delimiter;
-		if(message != null)
+		if (message != null)
 			s += "msg=" + message + delimiter;
-		if(sectionId != null)
+		if (sectionId != null)
 			s += "sec=" + sectionId + delimiter;
 		s = s.substring(0, s.length() - delimiter.length());
 		return s;

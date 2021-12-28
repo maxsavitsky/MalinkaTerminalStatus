@@ -29,12 +29,12 @@ public class Main {
 
 		InputStream is = System.in;
 		OutputStream os = System.out;
-		if(args.length >= 1){
+		if (args.length >= 1) {
 			os = new FileOutputStream(args[0]);
 			is = new FileInputStream(args[0]);
 			System.out.println("Input stream from " + args[0]);
 		}
-		if(args.length >= 2){
+		if (args.length >= 2) {
 			is = new FileInputStream(args[1]);
 		}
 
@@ -46,7 +46,7 @@ public class Main {
 		MessagesController.addSection(MessagesSection.getInstance());
 		MessagesController.start(terminal);
 
-		String msg = "Messages controller started after " + (System.currentTimeMillis() - startTime)/1000.0 + " seconds";
+		String msg = "Messages controller started after " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds";
 		System.out.println(msg);
 		MessagesSection.getInstance().write(
 				new Line("t", "msg", msg),
@@ -60,7 +60,7 @@ public class Main {
 
 		TaskManager.getInstance().schedule(SystemStatTask.TIMER_PERIOD, new SystemStatTask());
 
-		if(SystemUtils.IS_OS_LINUX){
+		if (SystemUtils.IS_OS_LINUX) {
 			TaskManager.getInstance().schedule(TempControlTask.TIMER_PERIOD, new TempControlTask());
 		}
 	}

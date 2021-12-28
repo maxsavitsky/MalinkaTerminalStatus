@@ -17,15 +17,14 @@ public class TempControlTask extends Task {
 		int temp = (int) Double.parseDouble(temperature.substring(0, temperature.length() - 3));
 		System.out.println("Current temperature is " + temp);
 		// TODO: 28.12.2021 notify about high temperature some way
-		if(temp >= SHUTDOWN_TEMP){
+		if (temp >= SHUTDOWN_TEMP) {
 			System.out.println("TEMPERATURE IS HIGH THAN " + SHUTDOWN_TEMP + ". SHUTDOWN");
-			if(SystemUtils.IS_OS_LINUX){
+			if (SystemUtils.IS_OS_LINUX) {
 				Utils.exec("shutdown -h now");
 				System.exit(0);
 			}
 		}
 	}
-
 
 
 }
