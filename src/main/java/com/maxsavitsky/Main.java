@@ -10,6 +10,7 @@ import com.maxsavitsky.tasks.TaskManager;
 import com.maxsavitsky.tasks.TempControlTask;
 import org.apache.commons.lang3.SystemUtils;
 
+import javax.mail.MessagingException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class Main {
 		System.out.println(System.getProperty("user.dir"));
 
 		MessagesListener.getInstance(); // start
+		MailSender.getInstance();
 
 		InputStream is = System.in;
 		OutputStream os = System.out;
