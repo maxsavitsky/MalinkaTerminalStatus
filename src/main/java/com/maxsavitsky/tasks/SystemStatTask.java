@@ -50,16 +50,18 @@ public class SystemStatTask extends Task {
 				)
 		);
 
-		int swapUsage = (int) ((osBean.getTotalSwapSpaceSize() - osBean.getFreeSwapSpaceSize()) * 100 / osBean.getTotalSwapSpaceSize());
-		lines.add(
-				new Line("swap-usage", "sys-stat",
-						swapUsage + "% "
-								+ getFormattedSize(osBean.getTotalSwapSpaceSize() - osBean.getFreeSwapSpaceSize())
-								+ "/"
-								+ getFormattedSize(osBean.getTotalSwapSpaceSize()),
-						"Swap usage"
-				)
-		);
+		if(osBean.getTotalSwapSpaceSize() > 0) {
+			int swapUsage = (int) ((osBean.getTotalSwapSpaceSize() - osBean.getFreeSwapSpaceSize()) * 100 / osBean.getTotalSwapSpaceSize());
+			lines.add(
+					new Line("swap-usage", "sys-stat",
+							swapUsage + "% "
+									+ getFormattedSize(osBean.getTotalSwapSpaceSize() - osBean.getFreeSwapSpaceSize())
+									+ "/"
+									+ getFormattedSize(osBean.getTotalSwapSpaceSize()),
+							"Swap usage"
+					)
+			);
+		}
 
 		if (SystemUtils.IS_OS_LINUX) {
 			String result = Utils.exec("vcgencmd measure_temp"); // temp=XX'C

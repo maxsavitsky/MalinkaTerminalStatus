@@ -37,8 +37,6 @@ public class MailSender {
 			properties.load(fis);
 			mail = properties.getProperty("mail");
 			pass = properties.getProperty("pass");
-			System.out.println(mail);
-			System.out.println(pass);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
