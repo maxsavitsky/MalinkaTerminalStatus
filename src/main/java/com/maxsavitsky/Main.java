@@ -29,15 +29,22 @@ public class Main {
 		MessagesListener.getInstance(); // start
 		MailSender.getInstance();
 
+		boolean enableTempControl = true;
+
 		InputStream is = System.in;
 		OutputStream os = System.out;
-		if (args.length >= 1) {
-			os = new FileOutputStream(args[0]);
-			is = new FileInputStream(args[0]);
-			System.out.println("Input stream from " + args[0]);
-		}
-		if (args.length >= 2) {
-			is = new FileInputStream(args[1]);
+		for(String arg : args){
+			if(arg.startsWith("--tty=")){
+				String tty = arg.substring(6);
+				os = new FileOutputStream(tty);
+				is = new FileInputStream(tty);
+				System.out.println("tty set to " + tty);
+			}else if(arg.equals("--disable-temp-control")){
+				enableTempControl = false;
+				System.out.println("WARNING! Temperature control disabled");
+			}else{
+				throw new IllegalArgumentException("Unknown argument '" + arg + "'");
+			}
 		}
 
 		TerminalScreen terminalScreen = new DefaultTerminalFactory(os, is, StandardCharsets.UTF_8).createScreen();
@@ -62,7 +69,7 @@ public class Main {
 
 		TaskManager.getInstance().schedule(SystemStatTask.TIMER_PERIOD, new SystemStatTask());
 
-		if (SystemUtils.IS_OS_LINUX) {
+		if (SystemUtils.IS_OS_LINUX && enableTempControl) {
 			TaskManager.getInstance().schedule(TempControlTask.TIMER_PERIOD, new TempControlTask());
 		}
 	}
