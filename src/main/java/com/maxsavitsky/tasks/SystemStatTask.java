@@ -7,24 +7,22 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SystemStatTask extends Task {
 
 	public static final long TIMER_PERIOD = 15000;
 
 	private final com.sun.management.OperatingSystemMXBean osBean;
-	private final Runtime runtime;
+	private final boolean enableServicesStats;
 
-	public SystemStatTask() {
-		runtime = Runtime.getRuntime();
+	public SystemStatTask(boolean enableServicesStats) {
+		this.enableServicesStats = enableServicesStats;
 		osBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 	}
 
@@ -70,53 +68,56 @@ public class SystemStatTask extends Task {
 					new Line("Temp", "sys-stat", temp, "Temp")
 			);
 
-			String[] services = new String[]{
-					"mstsite",
-					"mstauth",
-					"mstdrive",
-					"gitea",
-					"nginx",
-					"mysql",
-					"postfix",
-					"dovecot",
-					"clamav-daemon"
-			};
-			String[] servicesNames = new String[]{
-					"Site",
-					"Auth",
-					"Drive",
-					"Gitea",
-					"nginx",
-					"mysql",
-					"Postfix",
-					"Dovecot",
-					"ClamAV"
-			};
-			for (int i = 0; i < services.length; i++) {
-				String state = Utils.exec("systemctl is-active " + services[i])
-						.replaceAll("\n", "");
-				String status = Utils.exec("systemctl status %s".formatted(services[i]));
-				Process process = Runtime.getRuntime().exec("grep Memory");
-				OutputStream os = process.getOutputStream();
-				os.write(status.getBytes(StandardCharsets.UTF_8));
-				os.flush();
-				os.close();
+			if(enableServicesStats) {
+				String[] services = new String[]{
+						"mstsite",
+						"mstauth",
+						"mstdrive",
+						"gitea",
+						"nginx",
+						"mysql",
+						"postfix",
+						"dovecot",
+						"clamav-daemon"
+				};
+				String[] servicesNames = new String[]{
+						"Site",
+						"Auth",
+						"Drive",
+						"Gitea",
+						"nginx",
+						"mysql",
+						"Postfix",
+						"Dovecot",
+						"ClamAV"
+				};
+				for (int i = 0; i < services.length; i++) {
+					String state = Utils.exec("systemctl is-active " + services[i])
+							.replaceAll("\n", "");
+					String status = Utils.exec("systemctl status %s".formatted(services[i]));
+					Process process = Runtime.getRuntime().exec("grep Memory");
+					OutputStream os = process.getOutputStream();
+					os.write(status.getBytes(StandardCharsets.UTF_8));
+					os.flush();
+					os.close();
 
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				process.getInputStream().transferTo(bos);
+					ByteArrayOutputStream bos = new ByteArrayOutputStream();
+					process.getInputStream().transferTo(bos);
 
-				String memoryStr = bos.toString();
+					String memoryStr = bos.toString();
 
-				String msg = state;
-				if(memoryStr.length() > 0){
-					String[] p = memoryStr.split(":");
-					String s = p[1].replaceAll("\n", "").trim();
-					try {
-						Double.parseDouble(s.substring(0, s.length() - 1));
-						msg += " " + s;
-					}catch (NumberFormatException ignored){}
+					String msg = state;
+					if (memoryStr.length() > 0) {
+						String[] p = memoryStr.split(":");
+						String s = p[1].replaceAll("\n", "").trim();
+						try {
+							Double.parseDouble(s.substring(0, s.length() - 1));
+							msg += " " + s;
+						} catch (NumberFormatException ignored) {
+						}
+					}
+					lines.add(new Line(services[i], "sys-stat", msg, servicesNames[i]));
 				}
-				lines.add(new Line(services[i], "sys-stat", msg, servicesNames[i]));
 			}
 		}
 

@@ -30,6 +30,7 @@ public class Main {
 		MailSender.getInstance();
 
 		boolean enableTempControl = true;
+		boolean enableServicesStats = true;
 
 		InputStream is = System.in;
 		OutputStream os = System.out;
@@ -42,7 +43,9 @@ public class Main {
 			}else if(arg.equals("--disable-temp-control")){
 				enableTempControl = false;
 				System.out.println("WARNING! Temperature control disabled");
-			}else{
+			}else if(arg.equals("--disable-services-stats")){
+				enableServicesStats = false;
+			} else{
 				throw new IllegalArgumentException("Unknown argument '" + arg + "'");
 			}
 		}
@@ -67,7 +70,7 @@ public class Main {
 				terminal
 		);
 
-		TaskManager.getInstance().schedule(SystemStatTask.TIMER_PERIOD, new SystemStatTask());
+		TaskManager.getInstance().schedule(SystemStatTask.TIMER_PERIOD, new SystemStatTask(enableServicesStats));
 
 		if (SystemUtils.IS_OS_LINUX && enableTempControl) {
 			TaskManager.getInstance().schedule(TempControlTask.TIMER_PERIOD, new TempControlTask());
