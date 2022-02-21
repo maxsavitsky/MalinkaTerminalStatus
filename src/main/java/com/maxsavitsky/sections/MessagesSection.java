@@ -12,7 +12,6 @@ import java.util.ArrayList;
 public class MessagesSection extends Section {
 
 	private static final MessagesSection instance = new MessagesSection();
-	private static final int TIME_PREFIX_LEN = 14;
 	private static final int columnsOffset = Section.WIDTH / 2 + 1;
 	private static final int rowsOffset = 0;
 	private static final int columnsLimit = Section.WIDTH - columnsOffset;
@@ -33,7 +32,7 @@ public class MessagesSection extends Section {
 	public void write(Line line, Terminal terminal) throws IOException {
 		if (line.getMessage() == null)
 			return;
-		String time = new SimpleDateFormat("HH:mm:ss.SSS").format(new Date(line.getTime()));
+		String time = new SimpleDateFormat("HH:mm:ss.SSS dd.MM").format(new Date(line.getTime()));
 		String fullMessage = "[" + time + "] " + line.getMessage();
 
 		Message message = new Message(fullMessage);
