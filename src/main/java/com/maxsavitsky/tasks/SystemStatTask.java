@@ -72,7 +72,7 @@ public class SystemStatTask extends Task {
 			uptime /= 60;
 		}
 		if(uptime > 0){
-			uptimeString = uptime + "h " + uptimeString;
+			uptimeString = (uptime % 24) + "h " + uptimeString;
 			uptime /= 24;
 		}
 		if(uptime > 0){
