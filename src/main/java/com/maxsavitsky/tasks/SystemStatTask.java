@@ -1,6 +1,7 @@
 package com.maxsavitsky.tasks;
 
 import com.maxsavitsky.Line;
+import com.maxsavitsky.Main;
 import com.maxsavitsky.MessagesController;
 import com.maxsavitsky.Utils;
 import org.apache.commons.lang3.SystemUtils;
@@ -63,7 +64,7 @@ public class SystemStatTask extends Task {
 			);
 		}
 
-		SystemInfo systemInfo = new SystemInfo();
+		SystemInfo systemInfo = Main.getSystemInfo();
 		long uptime = systemInfo.getOperatingSystem().getSystemUptime();
 		String uptimeString = (uptime % 60) + "s";
 		uptime /= 60;
@@ -80,18 +81,12 @@ public class SystemStatTask extends Task {
 		}
 		lines.add(new Line("uptime", sysStatSecId, uptimeString, "Uptime"));
 
+		lines.add(new Line("temp", sysStatSecId, systemInfo.getHardware().getSensors().getCpuTemperature() + "'C", "Temp"));
+
 		lines.add(new Line("thread-count", sysStatSecId, "" + systemInfo.getOperatingSystem().getThreadCount(), "Thread count"));
 
-		if (SystemUtils.IS_OS_LINUX) {
-			String result = Utils.exec("vcgencmd measure_temp"); // temp=XX'C
-			String temp = result.substring("temp=".length());
-			lines.add(
-					new Line("Temp", sysStatSecId, temp, "Temp")
-			);
-
-			if(enableServicesStats) {
-				lines.addAll(getServicesStats());
-			}
+		if (SystemUtils.IS_OS_LINUX && enableServicesStats) {
+			lines.addAll(getServicesStats());
 		}
 
 		for (var l : lines) {

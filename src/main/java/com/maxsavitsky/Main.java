@@ -9,6 +9,7 @@ import com.maxsavitsky.tasks.SystemStatTask;
 import com.maxsavitsky.tasks.TaskManager;
 import com.maxsavitsky.tasks.TempControlTask;
 import org.apache.commons.lang3.SystemUtils;
+import oshi.SystemInfo;
 
 import javax.mail.MessagingException;
 import java.io.FileInputStream;
@@ -19,6 +20,12 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class Main {
+
+	private static final SystemInfo SYSTEM_INFO = new SystemInfo();
+
+	public static SystemInfo getSystemInfo() {
+		return SYSTEM_INFO;
+	}
 
 	public static long startTime;
 
