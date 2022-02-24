@@ -6,11 +6,15 @@ import com.maxsavitsky.Main;
 import com.maxsavitsky.MessagesController;
 import com.maxsavitsky.Utils;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 
 public class TempControlTask extends Task {
+
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public static final long TIMER_PERIOD = 1000 * 60L;
 
@@ -18,12 +22,13 @@ public class TempControlTask extends Task {
 
 	private static final int NOTIFICATION_TEMP = 70;
 
+	private long lastTemperaturePrintTime = 0;
+
 	@Override
 	public void execute() throws IOException {
-		String temperature = Utils.exec("vcgencmd measure_temp").substring(5);
 		double temp = Main.getSystemInfo().getHardware().getSensors().getCpuTemperature();
 		if(temp == 0 || Double.isNaN(temp)){
-			System.out.println("Failed to get temperature");
+			logger.error("Failed to get temperature");
 			MessagesController.handle(new Line(
 					null,
 					"msg",
@@ -31,12 +36,16 @@ public class TempControlTask extends Task {
 			));
 			return;
 		}
-		System.out.println("Current temperature is " + temp);
+		long time = System.currentTimeMillis();
+		if(time - lastTemperaturePrintTime >= 5L * 60 * 1000) {
+			logger.info("Current temperature is {}", temp);
+			lastTemperaturePrintTime = time;
+		}
 		if(temp >= NOTIFICATION_TEMP){
 			MessagesController.handle(new Line(
 					null,
 					"msg",
-					"Temp warning: " + temperature
+					"Temp warning: " + temp
 			));
 			try {
 				MailSender.getInstance().sendToAdmin("TEMPERATURE WARNING", "Current temperature is " + temp + "°C");
@@ -45,7 +54,7 @@ public class TempControlTask extends Task {
 			}
 		}
 		if (temp >= SHUTDOWN_TEMP) {
-			System.out.println("TEMPERATURE IS HIGH THAN " + SHUTDOWN_TEMP + ". SHUTDOWN");
+			logger.warn("TEMPERATURE IS HIGH THAN {}. SHUTDOWN", SHUTDOWN_TEMP);
 			try {
 				MailSender.getInstance().sendToAdmin("OVERTEMPERATURE", "Temperature is " + temp + "°C. Limit is " + SHUTDOWN_TEMP + "°C. SHUTDOWN");
 			} catch (MessagingException e) {
