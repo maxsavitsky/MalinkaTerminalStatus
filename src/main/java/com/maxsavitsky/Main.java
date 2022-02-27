@@ -3,7 +3,6 @@ package com.maxsavitsky;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import com.maxsavitsky.sections.MessagesSection;
 import com.maxsavitsky.sections.SystemStatusSection;
 import com.maxsavitsky.tasks.SystemStatTask;
@@ -12,12 +11,17 @@ import com.maxsavitsky.tasks.TempControlTask;
 import org.apache.commons.lang3.SystemUtils;
 import oshi.SystemInfo;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Main {
 
@@ -42,12 +46,21 @@ public class Main {
 					\t\tSpecifies where terminal should be displayed.
 					\t\tInput and output streams will be redirected.
 					\t\tFor example, --tty=dev/tty4
+					
 					\t--disable-temp-control
 					\t\tDisables temperature control (notifications, emergency shutdown).
+					
 					\t--execute-after-startup=COMMAND
 					\t\tThis command will be executed after terminal will be ready to display data.
+					
 					\t--port=PORT
 					\t\tSpecifies port which socket will listen.
+					
+					\t--services-list=path_to_file
+					\t\tThis file describes the services whose status should be displayed.
+					\t\tEach service is described by a separate line in the format 'id:name`
+					\t\tid should be identifier of service in systemctl
+					\t\tNote: Works only on linux
 					"""
 			);
 			return;
@@ -60,6 +73,7 @@ public class Main {
 		boolean enableServicesStats = true;
 		String afterStartupCommand = null;
 		int port = 8000;
+		String pathToServicesList = null;
 
 		InputStream is = System.in;
 		OutputStream os = System.out;
@@ -72,12 +86,12 @@ public class Main {
 			}else if(arg.equals("--disable-temp-control")){
 				enableTempControl = false;
 				System.out.println("WARNING! Temperature control disabled");
-			}else if(arg.equals("--disable-services-stats")) {
-				enableServicesStats = false;
 			}else if(arg.startsWith("--execute-after-startup=")) {
 				afterStartupCommand = arg.substring("--execute-after-startup=".length());
-			}else if(arg.startsWith("--port=")){
+			}else if(arg.startsWith("--port=")) {
 				port = Integer.parseInt(arg.substring("--port=".length()));
+			} else if(arg.startsWith("--services-list=")){
+				pathToServicesList = arg.substring("--services-list=".length());
 			} else{
 				throw new IllegalArgumentException("Unknown argument '" + arg + "'");
 			}
@@ -88,6 +102,7 @@ public class Main {
 		TerminalScreen terminalScreen = new DefaultTerminalFactory(os, is, StandardCharsets.UTF_8)
 				.createScreen();
 		terminalScreen.startScreen();
+		terminalScreen.doResizeIfNecessary();
 		Terminal terminal = terminalScreen.getTerminal();
 		terminal.setCursorVisible(false);
 		MessagesController.addSection(new SystemStatusSection(terminalScreen));
@@ -109,7 +124,12 @@ public class Main {
 				terminal
 		);
 
-		TaskManager.getInstance().schedule(SystemStatTask.TIMER_PERIOD, new SystemStatTask(enableServicesStats));
+		List<SystemStatTask.Service> services;
+		if(pathToServicesList == null)
+			services = Collections.emptyList();
+		else
+			services = getServicesFromFile(pathToServicesList);
+		TaskManager.getInstance().schedule(SystemStatTask.TIMER_PERIOD, new SystemStatTask(enableServicesStats, services));
 
 		if (SystemUtils.IS_OS_LINUX && enableTempControl) {
 			TaskManager.getInstance().schedule(TempControlTask.TIMER_PERIOD, new TempControlTask());
@@ -117,6 +137,32 @@ public class Main {
 
 		if(afterStartupCommand != null && !afterStartupCommand.isEmpty()){
 			Utils.exec(afterStartupCommand);
+		}
+	}
+
+	private static List<SystemStatTask.Service> getServicesFromFile(String path){
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)))){
+			ArrayList<SystemStatTask.Service> services = new ArrayList<>();
+			String line = reader.readLine();
+			int lineIndex = 1;
+			while(line != null){
+				if(line.isEmpty() || line.startsWith("#"))
+					continue;
+				int p = line.indexOf(':');
+				if(p == -1){
+					throw new IllegalArgumentException("Illegal format (should be `id:name`) at line " + lineIndex);
+				}
+				String serviceId = line.substring(0, p);
+				String serviceName = line.substring(p + 1);
+				services.add(new SystemStatTask.Service(serviceId, serviceName));
+
+				line = reader.readLine();
+				lineIndex++;
+			}
+			return services;
+		}catch (IOException e){
+			e.printStackTrace();
+			return Collections.emptyList();
 		}
 	}
 

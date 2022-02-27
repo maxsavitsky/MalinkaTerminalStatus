@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SystemStatTask extends Task {
 
@@ -22,8 +23,10 @@ public class SystemStatTask extends Task {
 
 	private final com.sun.management.OperatingSystemMXBean osBean;
 	private final boolean enableServicesStats;
+	private final List<Service> services;
 
-	public SystemStatTask(boolean enableServicesStats) {
+	public SystemStatTask(boolean enableServicesStats, List<Service> services) {
+		this.services = services;
 		this.enableServicesStats = enableServicesStats;
 		osBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 	}
@@ -98,34 +101,12 @@ public class SystemStatTask extends Task {
 		}
 	}
 
-	private static ArrayList<Line> getServicesStats() throws IOException {
+	private ArrayList<Line> getServicesStats() throws IOException {
 		ArrayList<Line> lines = new ArrayList<>();
-		String[] services = new String[]{
-				"mstsite",
-				"mstauth",
-				"mstdrive",
-				"gitea",
-				"nginx",
-				"mysql",
-				"postfix",
-				"dovecot",
-				"clamav-daemon"
-		};
-		String[] servicesNames = new String[]{
-				"Site",
-				"Auth",
-				"Drive",
-				"Gitea",
-				"nginx",
-				"mysql",
-				"Postfix",
-				"Dovecot",
-				"ClamAV"
-		};
-		for (int i = 0; i < services.length; i++) {
-			String state = Utils.exec("systemctl is-active " + services[i])
+		for(var service : services){
+			String state = Utils.exec("systemctl is-active " + service.id())
 					.replace("\n", "");
-			String status = Utils.exec("systemctl status %s".formatted(services[i]));
+			String status = Utils.exec("systemctl status %s".formatted(service.id()));
 			Process process = Runtime.getRuntime().exec("grep Memory");
 			OutputStream os = process.getOutputStream();
 			os.write(status.getBytes(StandardCharsets.UTF_8));
@@ -148,7 +129,7 @@ public class SystemStatTask extends Task {
 					// ignore
 				}
 			}
-			lines.add(new Line(services[i], "sys-stat", msg, servicesNames[i]));
+			lines.add(new Line(service.id(), "sys-stat", msg, service.name()));
 		}
 		return lines;
 	}
@@ -173,6 +154,9 @@ public class SystemStatTask extends Task {
 			usedString = usedString.substring(0, usedString.length() - 3);
 		}
 		return usedString + v;
+	}
+
+	public record Service(String id, String name){
 	}
 
 }
