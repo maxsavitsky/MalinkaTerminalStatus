@@ -48,6 +48,7 @@ public class Main {
 					\t\tSpecifies where terminal should be displayed.
 					\t\tInput and output streams will be redirected.
 					\t\tFor example, --tty=dev/tty4
+					\t\tDefault is current terminal
 					
 					\t--disable-temp-control
 					\t\tDisables temperature control (notifications, emergency shutdown).
@@ -57,6 +58,7 @@ public class Main {
 					
 					\t--port=PORT
 					\t\tSpecifies port which socket will listen.
+					\t\tDefault is 8000
 					
 					\t--services-list=path_to_file
 					\t\tThis file describes the services whose status should be displayed.
