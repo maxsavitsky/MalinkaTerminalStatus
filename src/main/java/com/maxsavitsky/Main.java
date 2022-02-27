@@ -38,6 +38,7 @@ public class Main {
 
 		boolean enableTempControl = true;
 		boolean enableServicesStats = true;
+		String afterStartupCommand = null;
 
 		InputStream is = System.in;
 		OutputStream os = System.out;
@@ -50,8 +51,10 @@ public class Main {
 			}else if(arg.equals("--disable-temp-control")){
 				enableTempControl = false;
 				System.out.println("WARNING! Temperature control disabled");
-			}else if(arg.equals("--disable-services-stats")){
+			}else if(arg.equals("--disable-services-stats")) {
 				enableServicesStats = false;
+			}else if(arg.startsWith("--execute-after-startup=")){
+				afterStartupCommand = arg.substring("--execute-after-startup=".length());
 			} else{
 				throw new IllegalArgumentException("Unknown argument '" + arg + "'");
 			}
@@ -81,6 +84,10 @@ public class Main {
 
 		if (SystemUtils.IS_OS_LINUX && enableTempControl) {
 			TaskManager.getInstance().schedule(TempControlTask.TIMER_PERIOD, new TempControlTask());
+		}
+
+		if(afterStartupCommand != null && !afterStartupCommand.isEmpty()){
+			Utils.exec(afterStartupCommand);
 		}
 	}
 
