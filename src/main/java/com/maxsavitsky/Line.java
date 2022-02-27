@@ -2,15 +2,13 @@ package com.maxsavitsky;
 
 public class Line {
 
-	public static final String delimiter = "~#";
+	public static final String DELIMITER = "~#";
 
-	private final String tag, sectionId;
+	private final String tag;
+	private final String sectionId;
 	private final long time;
-	private String message, label;
-
-	public Line(String tag, String sectionId) {
-		this(tag, sectionId, null, null);
-	}
+	private String message;
+	private String label;
 
 	public Line(String tag, String sectionId, String message) {
 		this(tag, sectionId, message, null);
@@ -19,7 +17,7 @@ public class Line {
 	public Line(String tag, String sectionId, String message, String label) {
 		this.tag = tag;
 		this.sectionId = sectionId;
-		this.message = message;
+		this.message = message == null ? null : message.trim();
 		this.label = label;
 		time = System.currentTimeMillis();
 	}
@@ -55,14 +53,14 @@ public class Line {
 	public String format() {
 		String s = "";
 		if (tag != null)
-			s += "tag=" + tag + delimiter;
+			s += "tag=" + tag + DELIMITER;
 		if (label != null)
-			s += "lbl=" + label + delimiter;
+			s += "lbl=" + label + DELIMITER;
 		if (message != null)
-			s += "msg=" + message + delimiter;
+			s += "msg=" + message + DELIMITER;
 		if (sectionId != null)
-			s += "sec=" + sectionId + delimiter;
-		s = s.substring(0, s.length() - delimiter.length());
+			s += "sec=" + sectionId + DELIMITER;
+		s = s.substring(0, s.length() - DELIMITER.length());
 		return s;
 	}
 

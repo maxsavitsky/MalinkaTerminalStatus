@@ -11,7 +11,6 @@ import com.maxsavitsky.tasks.TempControlTask;
 import org.apache.commons.lang3.SystemUtils;
 import oshi.SystemInfo;
 
-import javax.mail.MessagingException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,7 +26,11 @@ public class Main {
 		return SYSTEM_INFO;
 	}
 
-	public static long startTime;
+	private static long startTime;
+
+	public static long getStartTime() {
+		return startTime;
+	}
 
 	public static void main(String[] args) throws IOException {
 		startTime = System.currentTimeMillis();
@@ -64,9 +67,11 @@ public class Main {
 		terminalScreen.startScreen();
 		Terminal terminal = terminalScreen.getTerminal();
 		terminal.setCursorVisible(false);
-		MessagesController.addSection(new SystemStatusSection());
-		MessagesController.addSection(MessagesSection.getInstance());
+		MessagesController.addSection(new SystemStatusSection(terminalScreen));
+		MessagesController.addSection(MessagesSection.init(terminalScreen));
 		MessagesController.start(terminal);
+
+		terminal.addResizeListener(MessagesController::onTerminalSizeChange);
 
 		String msg = "Messages controller started after " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds";
 		System.out.println(msg);

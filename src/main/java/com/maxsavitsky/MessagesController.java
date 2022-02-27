@@ -1,5 +1,6 @@
 package com.maxsavitsky;
 
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.maxsavitsky.sections.Section;
 
@@ -8,12 +9,24 @@ import java.util.ArrayList;
 
 public class MessagesController {
 
+	private MessagesController(){}
+
 	private static final ArrayList<Section> sections = new ArrayList<>();
 
 	private static Terminal terminal;
 
 	public static void addSection(Section section) {
 		sections.add(section);
+	}
+
+	public static void onTerminalSizeChange(Terminal terminal, TerminalSize terminalSize) {
+		for(Section section : sections){
+			try {
+				section.onTerminalSizeChange(terminal, terminalSize);
+			}catch (IOException e){
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public static void handle(Line l) throws IOException {

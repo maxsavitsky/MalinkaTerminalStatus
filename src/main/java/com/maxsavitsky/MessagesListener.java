@@ -23,7 +23,7 @@ public class MessagesListener {
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
-			String msg = "Socket started after " + (System.currentTimeMillis() - Main.startTime) / 1000.0 + " seconds";
+			String msg = "Socket started after " + (System.currentTimeMillis() - Main.getStartTime()) / 1000.0 + " seconds";
 			System.out.println(msg);
 			addToBuffer("tag=t~#sec=msg~#msg=" + msg);
 			while (!Thread.currentThread().isInterrupted()) {
@@ -57,10 +57,6 @@ public class MessagesListener {
 		buffer.add(s);
 		while (buffer.size() > BUFFER_MAX_SIZE)
 			buffer.remove(0);
-	}
-
-	public ArrayList<String> getBuffer() {
-		return new ArrayList<>(buffer);
 	}
 
 	public void fetchBuffer(ListenerCallback callback) {
