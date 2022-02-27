@@ -62,7 +62,7 @@ public class Main {
 					
 					\t--services-list=path_to_file
 					\t\tThis file describes the services whose status should be displayed.
-					\t\tEach service is described by a separate line in the format 'id:name`
+					\t\tEach service is described by a separate line in the format id:name
 					\t\tid should be identifier of service in systemctl
 					\t\tNote: Works only on linux
 					"""
