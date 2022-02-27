@@ -34,6 +34,24 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws IOException {
+		if(args.length > 0 && args[0].equals("help")){
+			System.out.println(
+					"""
+					Arguments:
+					\t--tty=PATH_TO_TTY_DEV_BLOCK
+					\t\tSpecifies where terminal should be displayed.
+					\t\tInput and output streams will be redirected.
+					\t\tFor example, --tty=dev/tty4
+					\t--disable-temp-control
+					\t\tDisables temperature control (notifications, emergency shutdown).
+					\t--execute-after-startup=COMMAND
+					\t\tThis command will be executed after terminal will be ready to display data.
+					\t--port=PORT
+					\t\tSpecifies port which socket will listen.
+					"""
+			);
+			return;
+		}
 		startTime = System.currentTimeMillis();
 
 		MailSender.getInstance();
