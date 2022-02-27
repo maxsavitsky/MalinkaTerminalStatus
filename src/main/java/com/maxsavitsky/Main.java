@@ -41,6 +41,8 @@ public class Main {
 		if(args.length > 0 && args[0].equals("help")){
 			System.out.println(
 					"""
+					ESC to exit
+
 					Arguments:
 					\t--tty=PATH_TO_TTY_DEV_BLOCK
 					\t\tSpecifies where terminal should be displayed.
