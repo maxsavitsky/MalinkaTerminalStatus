@@ -3,6 +3,7 @@ package com.maxsavitsky;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.ansi.UnixLikeTerminal;
 import com.maxsavitsky.sections.MessagesSection;
 import com.maxsavitsky.sections.SystemStatusSection;
 import com.maxsavitsky.tasks.SystemStatTask;
@@ -34,14 +35,13 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 		startTime = System.currentTimeMillis();
-		System.out.println(System.getProperty("user.dir"));
 
-		MessagesListener.getInstance(); // start
 		MailSender.getInstance();
 
 		boolean enableTempControl = true;
 		boolean enableServicesStats = true;
 		String afterStartupCommand = null;
+		int port = 8000;
 
 		InputStream is = System.in;
 		OutputStream os = System.out;
@@ -56,14 +56,19 @@ public class Main {
 				System.out.println("WARNING! Temperature control disabled");
 			}else if(arg.equals("--disable-services-stats")) {
 				enableServicesStats = false;
-			}else if(arg.startsWith("--execute-after-startup=")){
+			}else if(arg.startsWith("--execute-after-startup=")) {
 				afterStartupCommand = arg.substring("--execute-after-startup=".length());
+			}else if(arg.startsWith("--port=")){
+				port = Integer.parseInt(arg.substring("--port=".length()));
 			} else{
 				throw new IllegalArgumentException("Unknown argument '" + arg + "'");
 			}
 		}
 
-		TerminalScreen terminalScreen = new DefaultTerminalFactory(os, is, StandardCharsets.UTF_8).createScreen();
+		MessagesListener.init(port);
+
+		TerminalScreen terminalScreen = new DefaultTerminalFactory(os, is, StandardCharsets.UTF_8)
+				.createScreen();
 		terminalScreen.startScreen();
 		Terminal terminal = terminalScreen.getTerminal();
 		terminal.setCursorVisible(false);
@@ -73,8 +78,9 @@ public class Main {
 
 		terminal.addResizeListener(MessagesController::onTerminalSizeChange);
 
+		KeyHandler.start(terminal);
+
 		String msg = "Messages controller started after " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds";
-		System.out.println(msg);
 		MessagesSection.getInstance().write(
 				new Line("t", "msg", msg),
 				terminal

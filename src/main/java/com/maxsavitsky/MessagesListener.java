@@ -10,21 +10,24 @@ import java.util.ArrayList;
 public class MessagesListener {
 
 	private static final int BUFFER_MAX_SIZE = 100;
-	private static final MessagesListener instance = new MessagesListener();
+	private static MessagesListener instance;
 	private final ArrayList<String> buffer = new ArrayList<>();
 	private final ArrayList<ListenerCallback> listenerCallbacks = new ArrayList<>();
 	private ServerSocket serverSocket;
 
-	private MessagesListener() {
+	public static void init(int port){
+		instance = new MessagesListener(port);
+	}
+
+	private MessagesListener(int port) {
 		new Thread(() -> {
 			try {
-				serverSocket = new ServerSocket(8000);
+				serverSocket = new ServerSocket(port);
 			} catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
 			String msg = "Socket started after " + (System.currentTimeMillis() - Main.getStartTime()) / 1000.0 + " seconds";
-			System.out.println(msg);
 			addToBuffer("tag=t~#sec=msg~#msg=" + msg);
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
