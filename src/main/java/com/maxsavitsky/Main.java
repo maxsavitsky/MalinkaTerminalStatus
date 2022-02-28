@@ -44,40 +44,48 @@ public class Main {
 					ESC to exit
 
 					Arguments:
-					\t--tty=PATH_TO_TTY_DEV_BLOCK
+					\t--tty=<path to console dev block>
 					\t\tSpecifies where terminal should be displayed.
 					\t\tInput and output streams will be redirected.
 					\t\tFor example, --tty=/dev/tty4
 					\t\tDefault is current terminal
 					
-					\t--disable-temp-control
-					\t\tDisables temperature control (notifications, emergency shutdown).
+					\t--temp-control-enabled=<true/false>
+					\t\tEnables or disables temperature control (notifications, emergency shutdown).
 					
-					\t--execute-after-startup=COMMAND
+					\t--execute-after-startup=<command>
 					\t\tThis command will be executed after terminal will be ready to display data.
 					
-					\t--port=PORT
+					\t--port=<port>
 					\t\tSpecifies port which socket will listen.
 					\t\tDefault is 8000
 					
-					\t--services-list=path_to_file
+					\t--services-list=<path to file>
 					\t\tThis file describes the services whose status should be displayed.
 					\t\tEach service is described by a separate line in the format id:name
 					\t\tid should be identifier of service in systemctl
 					\t\tNote: Works only on linux
+					
+					\t--mail-properties=<path>
+					\t\tFile describes mail configuration in key=value format.
+					\t\tIf not specified, notifications will not be sent
+					\t\tIt should contain:
+					\t\t- mail - describes mail address on whose behalf the message will be sent
+					\t\t- pass - password
+					\t\t- recipients-list - comma-separated list of recipients
+					\t\t- smtp-host - smtp host which will be used for mail sending (e.g. smtp.gmail.com)
 					"""
 			);
 			return;
 		}
 		startTime = System.currentTimeMillis();
 
-		MailSender.getInstance();
-
 		boolean enableTempControl = true;
 		boolean enableServicesStats = true;
 		String afterStartupCommand = null;
 		int port = 8000;
 		String pathToServicesList = null;
+		String mailPropertiesFile = null;
 
 		InputStream is = System.in;
 		OutputStream os = System.out;
@@ -86,22 +94,25 @@ public class Main {
 				String tty = arg.substring(6);
 				os = new FileOutputStream(tty);
 				is = new FileInputStream(tty);
-				System.out.println("tty set to " + tty);
-			}else if(arg.equals("--disable-temp-control")){
-				enableTempControl = false;
-				System.out.println("WARNING! Temperature control disabled");
+			}else if(arg.startsWith("--temp-control-enabled=")){
+				enableTempControl = Boolean.parseBoolean(arg.substring("--temp-control-enabled=".length()));
 			}else if(arg.startsWith("--execute-after-startup=")) {
 				afterStartupCommand = arg.substring("--execute-after-startup=".length());
 			}else if(arg.startsWith("--port=")) {
 				port = Integer.parseInt(arg.substring("--port=".length()));
 			} else if(arg.startsWith("--services-list=")){
 				pathToServicesList = arg.substring("--services-list=".length());
+			} else if(arg.startsWith("--mail-properties=")){
+				mailPropertiesFile = arg.substring("--mail-properties=".length());
 			} else{
 				throw new IllegalArgumentException("Unknown argument '" + arg + "'");
 			}
 		}
 
 		MessagesListener.init(port);
+
+		if(mailPropertiesFile != null)
+			MailSender.init(mailPropertiesFile);
 
 		TerminalScreen terminalScreen = new DefaultTerminalFactory(os, is, StandardCharsets.UTF_8)
 				.createScreen();

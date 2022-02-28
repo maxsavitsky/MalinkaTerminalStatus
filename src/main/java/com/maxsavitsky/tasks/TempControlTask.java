@@ -48,7 +48,8 @@ public class TempControlTask extends Task {
 					"Temp warning: " + temp
 			));
 			try {
-				MailSender.getInstance().sendToAdmin("TEMPERATURE WARNING", "Current temperature is " + temp + "°C");
+				if(MailSender.getInstance() != null)
+					MailSender.getInstance().sendToAdmin("TEMPERATURE WARNING", "Current temperature is " + temp + "°C");
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}
@@ -56,7 +57,8 @@ public class TempControlTask extends Task {
 		if (temp >= SHUTDOWN_TEMP) {
 			logger.warn("TEMPERATURE IS HIGH THAN {}. SHUTDOWN", SHUTDOWN_TEMP);
 			try {
-				MailSender.getInstance().sendToAdmin("OVERTEMPERATURE", "Temperature is " + temp + "°C. Limit is " + SHUTDOWN_TEMP + "°C. SHUTDOWN");
+				if(MailSender.getInstance() != null)
+					MailSender.getInstance().sendToAdmin("OVERTEMPERATURE", "Temperature is " + temp + "°C. Limit is " + SHUTDOWN_TEMP + "°C. SHUTDOWN");
 			} catch (MessagingException e) {
 				e.printStackTrace();
 			}
