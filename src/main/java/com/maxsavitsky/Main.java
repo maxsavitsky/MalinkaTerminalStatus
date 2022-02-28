@@ -47,7 +47,7 @@ public class Main {
 					\t--tty=PATH_TO_TTY_DEV_BLOCK
 					\t\tSpecifies where terminal should be displayed.
 					\t\tInput and output streams will be redirected.
-					\t\tFor example, --tty=dev/tty4
+					\t\tFor example, --tty=/dev/tty4
 					\t\tDefault is current terminal
 					
 					\t--disable-temp-control
