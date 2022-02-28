@@ -54,6 +54,14 @@ public class Main {
 					\t\tEnables or disables temperature control (notifications, emergency shutdown).
 					\t\tDefault is true
 					
+					\t--temp-control-period=<period in seconds>
+					\t\tSpecifies how often temperature checks will take place
+					\t\tDefault is 15
+					
+					\t--system-status-update-period=<period in seconds>
+					\t\tSpecifies how often system information will be updated
+					\t\tDefault is 15
+					
 					\t--execute-after-startup=<command>
 					\t\tThis command will be executed after terminal will be ready to display data.
 					
@@ -88,6 +96,9 @@ public class Main {
 		String pathToServicesList = null;
 		String mailPropertiesFile = null;
 
+		long tempControlPeriod = 15;
+		long sysStatPeriod = 15;
+
 		InputStream is = System.in;
 		OutputStream os = System.out;
 		for(String arg : args){
@@ -103,8 +114,12 @@ public class Main {
 				port = Integer.parseInt(arg.substring("--port=".length()));
 			} else if(arg.startsWith("--services-list=")){
 				pathToServicesList = arg.substring("--services-list=".length());
-			} else if(arg.startsWith("--mail-properties=")){
+			} else if(arg.startsWith("--mail-properties=")) {
 				mailPropertiesFile = arg.substring("--mail-properties=".length());
+			}else if(arg.startsWith("--temp-control-period=")){
+				tempControlPeriod = Long.parseLong(arg.substring("--temp-control-period=".length()));
+			}else if(arg.startsWith("--system-status-update-period=")) {
+				sysStatPeriod = Long.parseLong(arg.substring("--system-status-update-period=".length()));
 			} else{
 				throw new IllegalArgumentException("Unknown argument '" + arg + "'");
 			}
@@ -145,10 +160,10 @@ public class Main {
 			services = Collections.emptyList();
 		else
 			services = getServicesFromFile(pathToServicesList);
-		TaskManager.getInstance().schedule(SystemStatTask.TIMER_PERIOD, new SystemStatTask(enableServicesStats, services));
+		TaskManager.getInstance().schedule(sysStatPeriod * 1000, new SystemStatTask(enableServicesStats, services));
 
-		if (SystemUtils.IS_OS_LINUX && enableTempControl) {
-			TaskManager.getInstance().schedule(TempControlTask.TIMER_PERIOD, new TempControlTask());
+		if (enableTempControl) {
+			TaskManager.getInstance().schedule(tempControlPeriod * 1000, new TempControlTask());
 		}
 
 		if(afterStartupCommand != null && !afterStartupCommand.isEmpty()){
