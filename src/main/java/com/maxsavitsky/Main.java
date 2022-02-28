@@ -52,6 +52,7 @@ public class Main {
 					
 					\t--temp-control-enabled=<true/false>
 					\t\tEnables or disables temperature control (notifications, emergency shutdown).
+					\t\tDefault is true
 					
 					\t--execute-after-startup=<command>
 					\t\tThis command will be executed after terminal will be ready to display data.
@@ -60,7 +61,7 @@ public class Main {
 					\t\tSpecifies port which socket will listen.
 					\t\tDefault is 8000
 					
-					\t--services-list=<path to file>
+					\t--services-list=<path>
 					\t\tThis file describes the services whose status should be displayed.
 					\t\tEach service is described by a separate line in the format id:name
 					\t\tid should be identifier of service in systemctl
