@@ -27,7 +27,7 @@ Arguments:
         --tty=PATH_TO_TTY_DEV_BLOCK
                 Specifies where terminal should be displayed.
                 Input and output streams will be redirected.
-                For example, --tty=dev/tty4
+                For example, --tty=/dev/tty4
                 Default is current terminal
 
         --disable-temp-control
