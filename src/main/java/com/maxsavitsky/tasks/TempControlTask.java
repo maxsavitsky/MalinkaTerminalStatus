@@ -52,12 +52,10 @@ public class TempControlTask extends Task {
 			logger.info("Current temperature is {}", temp);
 			lastTemperaturePrintTime = time;
 		}
-		if (temp >= NOTIFICATION_TEMP) {
-			printMessage("Temp warning: " + temp);
-			sendMail("TEMPERATURE WARNING", "Current temperature is " + temp + "°C");
-		}
+
 		if (temp >= SHUTDOWN_TEMP) {
 			logger.warn("TEMPERATURE IS HIGH THAN {}. SHUTDOWN", SHUTDOWN_TEMP);
+			printMessage("Overheating! Temp: " + temp);
 			sendMail("OVERHEATING", "Temperature is " + temp + "°C. Limit is " + SHUTDOWN_TEMP + "°C. SHUTDOWN");
 			String shutdownCommand = getShutdownCommand();
 			if (shutdownCommand == null) {
@@ -66,13 +64,15 @@ public class TempControlTask extends Task {
 				Utils.exec(shutdownCommand);
 				System.exit(0);
 			}
+		}else if (temp >= NOTIFICATION_TEMP) {
+			printMessage("Temp warning: " + temp);
+			sendMail("TEMPERATURE WARNING", "Current temperature is " + temp + "°C");
 		}
 	}
 
 	private String getShutdownCommand() {
 		return switch (SystemInfo.getCurrentPlatform()) {
-			case LINUX, MACOS -> "shutdown -h now";
-			case FREEBSD, KFREEBSD, NETBSD, OPENBSD -> "halt";
+			case LINUX, MACOS, FREEBSD, KFREEBSD, NETBSD, OPENBSD -> "shutdown -h +5";
 			case WINDOWS, WINDOWSCE -> "shutdown /s /f /t 5";
 			default -> null;
 		};
