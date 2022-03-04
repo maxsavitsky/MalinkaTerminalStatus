@@ -1,4 +1,4 @@
-package com.maxsavitsky;
+package com.maxsavitsky.keybinder;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
@@ -28,9 +28,7 @@ public class KeyHandler {
 	}
 
 	private void processKeyStroke(KeyStroke keyStroke){
-		if(keyStroke.getKeyType() == KeyType.Escape){
-			System.exit(0);
-		}
+		KeyProcessor.getInstance().process(keyStroke);
 	}
 
 }

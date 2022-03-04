@@ -3,12 +3,13 @@ package com.maxsavitsky;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.maxsavitsky.keybinder.KeyHandler;
+import com.maxsavitsky.keybinder.KeyProcessor;
 import com.maxsavitsky.sections.MessagesSection;
 import com.maxsavitsky.sections.SystemStatusSection;
 import com.maxsavitsky.tasks.SystemStatTask;
 import com.maxsavitsky.tasks.TaskManager;
 import com.maxsavitsky.tasks.TempControlTask;
-import org.apache.commons.lang3.SystemUtils;
 import oshi.SystemInfo;
 
 import java.io.BufferedReader;
@@ -41,7 +42,7 @@ public class Main {
 		if(args.length > 0 && args[0].equals("help")){
 			System.out.println(
 					"""
-					ESC to exit
+					ESC or Ctrl-X to exit (sometimes Enter should be pressed)
 
 					Arguments:
 					\t--tty=<path to console dev block>
@@ -143,6 +144,16 @@ public class Main {
 		terminal.addResizeListener(MessagesController::onTerminalSizeChange);
 
 		KeyHandler.start(terminal);
+
+		KeyProcessor.getInstance().addShutdownHook(()->{
+			try {
+				terminalScreen.stopScreen();
+				terminal.clearScreen();
+				terminal.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 
 		String msg = "Messages controller started after " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds";
 		MessagesSection.getInstance().write(

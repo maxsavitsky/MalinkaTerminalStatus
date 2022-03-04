@@ -38,6 +38,10 @@ public class MessagesController {
 		}
 	}
 
+	public static void printMessage(String message) throws IOException {
+		handle(new Line(null, "msg", message));
+	}
+
 	public static void start(final Terminal terminal) {
 		MessagesController.terminal = terminal;
 		MessagesListener.ListenerCallback callback = MessagesController::handleMessage;
