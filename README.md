@@ -21,30 +21,48 @@ $ java -jar target\MalinkaTerminalStatus-1.0-shaded.jar
 ## Help
 You can also see this output if you specify `help` as the first parameter
 ```
-ESC to exit
+ESC or Ctrl-X to exit (sometimes Enter should be pressed)
 
 Arguments:
-        --tty=PATH_TO_TTY_DEV_BLOCK
+        --tty=<path to console dev block>
                 Specifies where terminal should be displayed.
                 Input and output streams will be redirected.
                 For example, --tty=/dev/tty4
                 Default is current terminal
 
-        --disable-temp-control
-                Disables temperature control (notifications, emergency shutdown).
+        --temp-control-enabled=<true/false>
+                Enables or disables temperature control (notifications, emergency shutdown).
+                Default is true
 
-        --execute-after-startup=COMMAND
+        --temp-control-period=<period in seconds>
+                Specifies how often temperature checks will take place
+                Default is 15
+
+        --system-status-update-period=<period in seconds>
+                Specifies how often system information will be updated
+                Default is 15
+
+        --execute-after-startup=<command>
                 This command will be executed after terminal will be ready to display data.
 
-        --port=PORT
+        --port=<port>
                 Specifies port which socket will listen.
                 Default is 8000
 
-        --services-list=path_to_file
+        --services-list=<path>
                 This file describes the services whose status should be displayed.
                 Each service is described by a separate line in the format id:name
                 id should be identifier of service in systemctl
                 Note: Works only on linux
+
+        --mail-properties=<path>
+                File describes mail configuration in key=value format.
+                If not specified, notifications will not be sent
+                It should contain:
+                - mail - describes mail address on whose behalf the message will be sent
+                - pass - password
+                - recipients-list - comma-separated list of recipients
+                - smtp-host - smtp host which will be used for mail sending (e.g. smtp.gmail.com)
 ```
 
 ## About name
