@@ -14,7 +14,9 @@ import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class SystemStatTask extends Task {
@@ -35,6 +37,15 @@ public class SystemStatTask extends Task {
 	public void execute() throws IOException {
 		String sysStatSecId = "sys-stat";
 		ArrayList<Line> lines = new ArrayList<>();
+
+		lines.add(
+				new Line("time",
+						sysStatSecId,
+						new SimpleDateFormat("HH:mm:ss").format(new Date()),
+						"Time"
+				)
+		);
+
 		lines.add(
 				new Line(
 						"cpu",
@@ -43,6 +54,7 @@ public class SystemStatTask extends Task {
 						"CPU usage"
 				)
 		);
+
 		int memoryUsage = (int) ((osBean.getTotalMemorySize() - osBean.getFreeMemorySize()) * 100 / osBean.getTotalMemorySize());
 		lines.add(
 				new Line("ram", sysStatSecId,
