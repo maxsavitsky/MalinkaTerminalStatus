@@ -46,7 +46,7 @@ public class TaskManager {
 					}
 				}
 			}
-		}, 2000, period);
+		}, 100, period);
 		timerHashMap.put(period, timer);
 	}
 
