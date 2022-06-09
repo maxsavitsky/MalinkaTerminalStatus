@@ -14,6 +14,7 @@ public class MessagesListener {
 	private final ArrayList<String> buffer = new ArrayList<>();
 	private final ArrayList<ListenerCallback> listenerCallbacks = new ArrayList<>();
 	private ServerSocket serverSocket;
+	private final static Object BUFFER_LOCK = new Object();
 
 	public static void init(int port){
 		instance = new MessagesListener(port);
@@ -57,19 +58,23 @@ public class MessagesListener {
 	}
 
 	private void addToBuffer(String s) {
-		buffer.add(s);
-		while (buffer.size() > BUFFER_MAX_SIZE)
-			buffer.remove(0);
+		synchronized(BUFFER_LOCK) {
+			buffer.add(s);
+			while (buffer.size() > BUFFER_MAX_SIZE)
+				buffer.remove(0);
+		}
 	}
 
 	public void fetchBuffer(ListenerCallback callback) {
-		for (String s : buffer)
-			callback.onMessage(s);
+		synchronized (BUFFER_LOCK) {
+			for (String s : buffer)
+				callback.onMessage(s);
+		}
 	}
 
 	public void handle(String s) {
-		for (var l : listenerCallbacks)
-			l.onMessage(s);
+		for (var callback : listenerCallbacks)
+			callback.onMessage(s);
 	}
 
 	public interface ListenerCallback {
