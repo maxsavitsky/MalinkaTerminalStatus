@@ -66,6 +66,9 @@ public class Main {
 					\t--execute-after-startup=<command>
 					\t\tThis command will be executed after terminal will be ready to display data.
 					
+					\t--execute-before-shutdown=<command>
+					\t\tThis command will be executed before terminal will be closed.
+					
 					\t--port=<port>
 					\t\tSpecifies port which socket will listen.
 					\t\tDefault is 8000
@@ -93,6 +96,7 @@ public class Main {
 		boolean enableTempControl = true;
 		boolean enableServicesStats = true;
 		String afterStartupCommand = null;
+		String beforeShutdownCommand = null;
 		int port = 8000;
 		String pathToServicesList = null;
 		String mailPropertiesFile = null;
@@ -104,13 +108,15 @@ public class Main {
 		OutputStream os = System.out;
 		for(String arg : args){
 			if(arg.startsWith("--tty=")){
-				String tty = arg.substring(6);
+				String tty = arg.substring("--tty=".length());
 				os = new FileOutputStream(tty);
 				is = new FileInputStream(tty);
 			}else if(arg.startsWith("--temp-control-enabled=")){
 				enableTempControl = Boolean.parseBoolean(arg.substring("--temp-control-enabled=".length()));
 			}else if(arg.startsWith("--execute-after-startup=")) {
 				afterStartupCommand = arg.substring("--execute-after-startup=".length());
+			}else if(arg.startsWith("--execute-before-shutdown=")) {
+				beforeShutdownCommand = arg.substring("--execute-before-shutdown=".length());
 			}else if(arg.startsWith("--port=")) {
 				port = Integer.parseInt(arg.substring("--port=".length()));
 			} else if(arg.startsWith("--services-list=")){
@@ -145,7 +151,14 @@ public class Main {
 
 		KeyHandler.start(terminal);
 
+		String finalBeforeShutdownCommand = beforeShutdownCommand;
 		KeyProcessor.getInstance().addShutdownHook(()->{
+			try {
+				if(finalBeforeShutdownCommand != null && !finalBeforeShutdownCommand.isEmpty())
+					Utils.exec(finalBeforeShutdownCommand);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			try {
 				terminalScreen.stopScreen();
 				terminal.clearScreen();

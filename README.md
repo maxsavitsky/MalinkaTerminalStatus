@@ -44,6 +44,9 @@ Arguments:
 
         --execute-after-startup=<command>
                 This command will be executed after terminal will be ready to display data.
+                
+        --execute-before-shutdown=<command>
+                This command will be executed before terminal will be closed.
 
         --port=<port>
                 Specifies port which socket will listen.
