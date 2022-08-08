@@ -4,6 +4,7 @@ import com.maxsavitsky.Line;
 import com.maxsavitsky.Main;
 import com.maxsavitsky.MessagesController;
 import com.maxsavitsky.Utils;
+import com.maxsavitsky.tasks.provider.SystemInfoProvider;
 import org.apache.commons.lang3.SystemUtils;
 import oshi.SystemInfo;
 
@@ -23,18 +24,21 @@ public class SystemStatTask extends Task {
 
 	public static final long TIMER_PERIOD = 15000;
 
-	private final com.sun.management.OperatingSystemMXBean osBean;
 	private final boolean enableServicesStats;
 	private final List<Service> services;
 
-	public SystemStatTask(boolean enableServicesStats, List<Service> services) {
+	private final SystemInfoProvider provider;
+
+	public SystemStatTask(boolean enableServicesStats, List<Service> services, SystemInfoProvider provider) {
 		this.services = services;
 		this.enableServicesStats = enableServicesStats;
-		osBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+		this.provider = provider;
 	}
 
 	@Override
 	public void execute() throws IOException {
+		provider.fetch();
+
 		String sysStatSecId = "sys-stat";
 		ArrayList<Line> lines = new ArrayList<>();
 
@@ -46,34 +50,57 @@ public class SystemStatTask extends Task {
 				)
 		);
 
-		lines.add(
-				new Line(
-						"cpu",
-						sysStatSecId,
-						(int) (osBean.getCpuLoad() * 100) + "%",
-						"CPU usage"
-				)
-		);
+		double[] cpuUsage = provider.getCoresLoad();
+		for(int i = 0; i < cpuUsage.length; i++){
+			lines.add(
+					new Line("cpu-" + i,
+							sysStatSecId,
+							(int) (cpuUsage[i] * 100) + "%",
+							i == 0 ? "CPU usage" : "CPU " + i + " usage"
+					)
+			);
+		}
 
-		int memoryUsage = (int) ((osBean.getTotalMemorySize() - osBean.getFreeMemorySize()) * 100 / osBean.getTotalMemorySize());
+		long memoryUsage = provider.getUsedMemorySize() * 100L / provider.getTotalMemorySize();
 		lines.add(
 				new Line("ram", sysStatSecId,
 						 memoryUsage + "% "
-								 + getFormattedSize(osBean.getTotalMemorySize() - osBean.getFreeMemorySize())
+								 + getFormattedSize(provider.getUsedMemorySize())
 								 + "/"
-								 + getFormattedSize(osBean.getTotalMemorySize()),
+								 + getFormattedSize(provider.getTotalMemorySize()),
 						"RAM usage"
 				)
 		);
 
-		if(osBean.getTotalSwapSpaceSize() > 0) {
-			int swapUsage = (int) ((osBean.getTotalSwapSpaceSize() - osBean.getFreeSwapSpaceSize()) * 100 / osBean.getTotalSwapSpaceSize());
+		if(provider.getAvailableMemorySize() >= 0) {
+			long availableMemoryPercentage = provider.getAvailableMemorySize() * 100L / provider.getTotalMemorySize();
+			lines.add(
+					new Line("ram-available", sysStatSecId,
+							availableMemoryPercentage + "% "
+									+ getFormattedSize(provider.getAvailableMemorySize()),
+							"RAM available"
+					)
+			);
+		}
+
+		long usedCacheSize = provider.getUsedCacheSize();
+		if(usedCacheSize > 0){
+			lines.add(
+					new Line("ram-cache", sysStatSecId,
+							 getFormattedSize(usedCacheSize),
+							 "RAM cache"
+					)
+			);
+		}
+
+		if(provider.getTotalSwapSize() > 0) {
+			int swapUsage = (int) ((provider.getUsedSwapSize()) * 100 / provider.getTotalSwapSize());
 			lines.add(
 					new Line("swap-usage", sysStatSecId,
 							swapUsage + "% "
-									+ getFormattedSize(osBean.getTotalSwapSpaceSize() - osBean.getFreeSwapSpaceSize())
+									+ getFormattedSize(provider.getUsedSwapSize())
 									+ "/"
-									+ getFormattedSize(osBean.getTotalSwapSpaceSize()),
+									+ getFormattedSize(provider.getTotalSwapSize()),
 							"Swap usage"
 					)
 			);

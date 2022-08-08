@@ -10,6 +10,10 @@ import com.maxsavitsky.sections.SystemStatusSection;
 import com.maxsavitsky.tasks.SystemStatTask;
 import com.maxsavitsky.tasks.TaskManager;
 import com.maxsavitsky.tasks.TempControlTask;
+import com.maxsavitsky.tasks.provider.DefaultSystemInfoProvider;
+import com.maxsavitsky.tasks.provider.LinuxSystemInfoProvider;
+import com.maxsavitsky.tasks.provider.SystemInfoProvider;
+import org.apache.commons.lang3.SystemUtils;
 import oshi.SystemInfo;
 
 import java.io.BufferedReader;
@@ -102,7 +106,7 @@ public class Main {
 		String mailPropertiesFile = null;
 
 		long tempControlPeriod = 15;
-		long sysStatPeriod = 15;
+		long sysStatPeriod = 1;
 
 		InputStream is = System.in;
 		OutputStream os = System.out;
@@ -184,7 +188,7 @@ public class Main {
 			services = Collections.emptyList();
 		else
 			services = getServicesFromFile(pathToServicesList);
-		TaskManager.getInstance().schedule(sysStatPeriod * 1000, new SystemStatTask(enableServicesStats, services));
+		TaskManager.getInstance().schedule(sysStatPeriod * 1000, new SystemStatTask(enableServicesStats, services, getSystemInfoProvider()));
 
 		if (enableTempControl) {
 			TaskManager.getInstance().schedule(tempControlPeriod * 1000, new TempControlTask());
@@ -193,6 +197,12 @@ public class Main {
 		if(afterStartupCommand != null && !afterStartupCommand.isEmpty()){
 			Utils.exec(afterStartupCommand);
 		}
+	}
+
+	public static SystemInfoProvider getSystemInfoProvider(){
+		if(SystemUtils.IS_OS_LINUX)
+			return new LinuxSystemInfoProvider();
+		return new DefaultSystemInfoProvider();
 	}
 
 	private static List<SystemStatTask.Service> getServicesFromFile(String path){
