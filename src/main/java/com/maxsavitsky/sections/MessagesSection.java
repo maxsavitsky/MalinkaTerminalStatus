@@ -4,7 +4,7 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.maxsavitsky.Line;
+import com.maxsavitsky.Content;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -56,11 +56,11 @@ public class MessagesSection extends Section {
 	}
 
 	@Override
-	public void write(Line line, Terminal terminal) throws IOException {
-		if (line.getMessage() == null)
+	public void write(Content content, Terminal terminal) throws IOException {
+		if (content.getMessage() == null)
 			return;
-		String time = new SimpleDateFormat("HH:mm:ss.SSS dd.MM").format(new Date(line.getTime()));
-		String fullMessage = "[" + time + "] " + line.getMessage();
+		String time = new SimpleDateFormat("HH:mm:ss.SSS dd.MM").format(new Date(content.getTime()));
+		String fullMessage = "[" + time + "] " + content.getMessage();
 
 		Message message = new Message(fullMessage);
 		messages.add(message);

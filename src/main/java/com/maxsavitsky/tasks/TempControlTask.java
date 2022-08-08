@@ -1,6 +1,6 @@
 package com.maxsavitsky.tasks;
 
-import com.maxsavitsky.Line;
+import com.maxsavitsky.Content;
 import com.maxsavitsky.MailSender;
 import com.maxsavitsky.Main;
 import com.maxsavitsky.MessagesController;
@@ -19,7 +19,7 @@ public class TempControlTask extends Task {
 	private long lastTemperaturePrintTime = 0;
 
 	private void printMessage(String message) throws IOException {
-		MessagesController.handle(new Line(
+		MessagesController.handle(new Content(
 				null,
 				"msg",
 				message

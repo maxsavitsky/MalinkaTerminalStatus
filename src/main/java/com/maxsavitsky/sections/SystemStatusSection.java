@@ -2,10 +2,9 @@ package com.maxsavitsky.sections;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.maxsavitsky.Line;
+import com.maxsavitsky.Content;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ public class SystemStatusSection extends Section {
 	private int rowsLimit;
 	private int columnsLimit;
 
-	private final ArrayList<Line> lines = new ArrayList<>();
+	private final ArrayList<Content> contents = new ArrayList<>();
 
 	public SystemStatusSection(TerminalScreen terminalScreen){
 		changeSize(terminalScreen.getTerminalSize());
@@ -45,19 +44,19 @@ public class SystemStatusSection extends Section {
 	}
 
 	@Override
-	public void write(Line line, Terminal terminal) throws IOException {
+	public void write(Content line, Terminal terminal) throws IOException {
 		if (line.getMessage() == null)
 			throw new UnsupportedOperationException("Message is null");
 		int lineIndex = -1;
-		for (int i = 0; i < lines.size(); i++) {
-			if (lines.get(i).getTag().equals(line.getTag())) {
+		for (int i = 0; i < contents.size(); i++) {
+			if (contents.get(i).getTag().equals(line.getTag())) {
 				lineIndex = i;
 				break;
 			}
 		}
 		if (lineIndex == -1) {
-			lineIndex = lines.size();
-			lines.add(line);
+			lineIndex = contents.size();
+			contents.add(line);
 		}
 		lineIndex += rowsOffset;
 
@@ -76,10 +75,10 @@ public class SystemStatusSection extends Section {
 	}
 
 	private void rewrite(Terminal terminal) throws IOException {
-		for(Line line : lines){
-			write(line, terminal);
+		for(Content content : contents){
+			write(content, terminal);
 		}
-		for(int j = lines.size(); j < rowsLimit; j++){
+		for(int j = contents.size(); j < rowsLimit; j++){
 			terminal.setCursorPosition(new TerminalPosition(columnsOffset, j));
 			clearLine(terminal, columnsLimit);
 		}

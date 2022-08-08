@@ -29,7 +29,7 @@ public class MessagesController {
 		}
 	}
 
-	public static void handle(Line l) throws IOException {
+	public static void handle(Content l) throws IOException {
 		for (Section s : sections) {
 			if (s.getIdentifier().equals(l.getSectionId())) {
 				s.write(l, terminal);
@@ -39,7 +39,7 @@ public class MessagesController {
 	}
 
 	public static void printMessage(String message) throws IOException {
-		handle(new Line(null, "msg", message));
+		handle(new Content(null, "msg", message));
 	}
 
 	public static void start(final Terminal terminal) {
@@ -71,10 +71,10 @@ public class MessagesController {
 				}
 			}
 		}
-		Line l = new Line(tag, secId, msg, label);
+		Content content = new Content(tag, secId, msg, label);
 
 		try {
-			handle(l);
+			handle(content);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

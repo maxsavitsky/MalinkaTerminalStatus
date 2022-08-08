@@ -79,7 +79,7 @@ public class Main {
 					
 					\t--services-list=<path>
 					\t\tThis file describes the services whose status should be displayed.
-					\t\tEach service is described by a separate line in the format id:name
+					\t\tEach service is described by a separate content in the format id:name
 					\t\tid should be identifier of service in systemctl
 					\t\tNote: Works only on linux
 					
@@ -174,12 +174,12 @@ public class Main {
 
 		String msg = "Messages controller started after " + (System.currentTimeMillis() - startTime) / 1000.0 + " seconds";
 		MessagesSection.getInstance().write(
-				new Line("t", "msg", msg),
+				new Content("t", "msg", msg),
 				terminal
 		);
 
 		MessagesSection.getInstance().write(
-				new Line("t", "msg", "Started as " + Utils.exec("whoami")),
+				new Content("t", "msg", "Started as " + Utils.exec("whoami")),
 				terminal
 		);
 
@@ -208,20 +208,20 @@ public class Main {
 	private static List<SystemStatTask.Service> getServicesFromFile(String path){
 		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)))){
 			ArrayList<SystemStatTask.Service> services = new ArrayList<>();
-			String line = reader.readLine();
+			String content = reader.readLine();
 			int lineIndex = 1;
-			while(line != null){
-				if(line.isEmpty() || line.startsWith("#"))
+			while(content != null){
+				if(content.isEmpty() || content.startsWith("#"))
 					continue;
-				int p = line.indexOf(':');
+				int p = content.indexOf(':');
 				if(p == -1){
-					throw new IllegalArgumentException("Illegal format (should be `id:name`) at line " + lineIndex);
+					throw new IllegalArgumentException("Illegal format (should be `id:name`) at content " + lineIndex);
 				}
-				String serviceId = line.substring(0, p);
-				String serviceName = line.substring(p + 1);
+				String serviceId = content.substring(0, p);
+				String serviceName = content.substring(p + 1);
 				services.add(new SystemStatTask.Service(serviceId, serviceName));
 
-				line = reader.readLine();
+				content = reader.readLine();
 				lineIndex++;
 			}
 			return services;

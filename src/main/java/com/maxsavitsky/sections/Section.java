@@ -2,7 +2,7 @@ package com.maxsavitsky.sections;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.maxsavitsky.Line;
+import com.maxsavitsky.Content;
 
 import java.io.IOException;
 
@@ -10,7 +10,7 @@ public abstract class Section {
 
 	public abstract String getIdentifier();
 
-	public abstract void write(Line line, Terminal terminal) throws IOException;
+	public abstract void write(Content content, Terminal terminal) throws IOException;
 
 	public void onTerminalSizeChange(Terminal terminal, TerminalSize newTerminalSize) throws IOException{
 	}

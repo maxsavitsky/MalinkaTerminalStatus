@@ -1,6 +1,6 @@
 package com.maxsavitsky.tasks;
 
-import com.maxsavitsky.Line;
+import com.maxsavitsky.Content;
 import com.maxsavitsky.Main;
 import com.maxsavitsky.MessagesController;
 import com.maxsavitsky.Utils;
@@ -11,7 +11,6 @@ import oshi.SystemInfo;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
@@ -40,10 +39,10 @@ public class SystemStatTask extends Task {
 		provider.fetch();
 
 		String sysStatSecId = "sys-stat";
-		ArrayList<Line> lines = new ArrayList<>();
+		ArrayList<Content> contents = new ArrayList<>();
 
-		lines.add(
-				new Line("time",
+		contents.add(
+				new Content("time",
 						sysStatSecId,
 						new SimpleDateFormat("HH:mm:ss").format(new Date()),
 						"Time"
@@ -52,8 +51,8 @@ public class SystemStatTask extends Task {
 
 		double[] cpuUsage = provider.getCoresLoad();
 		for(int i = 0; i < cpuUsage.length; i++){
-			lines.add(
-					new Line("cpu-" + i,
+			contents.add(
+					new Content("cpu-" + i,
 							sysStatSecId,
 							(int) (cpuUsage[i] * 100) + "%",
 							i == 0 ? "CPU usage" : "CPU " + i + " usage"
@@ -62,8 +61,8 @@ public class SystemStatTask extends Task {
 		}
 
 		long memoryUsage = provider.getUsedMemorySize() * 100L / provider.getTotalMemorySize();
-		lines.add(
-				new Line("ram", sysStatSecId,
+		contents.add(
+				new Content("ram", sysStatSecId,
 						 memoryUsage + "% "
 								 + getFormattedSize(provider.getUsedMemorySize())
 								 + "/"
@@ -74,8 +73,8 @@ public class SystemStatTask extends Task {
 
 		if(provider.getAvailableMemorySize() >= 0) {
 			long availableMemoryPercentage = provider.getAvailableMemorySize() * 100L / provider.getTotalMemorySize();
-			lines.add(
-					new Line("ram-available", sysStatSecId,
+			contents.add(
+					new Content("ram-available", sysStatSecId,
 							availableMemoryPercentage + "% "
 									+ getFormattedSize(provider.getAvailableMemorySize()),
 							"RAM available"
@@ -85,8 +84,8 @@ public class SystemStatTask extends Task {
 
 		long usedCacheSize = provider.getUsedCacheSize();
 		if(usedCacheSize > 0){
-			lines.add(
-					new Line("ram-cache", sysStatSecId,
+			contents.add(
+					new Content("ram-cache", sysStatSecId,
 							 getFormattedSize(usedCacheSize),
 							 "RAM cache"
 					)
@@ -95,8 +94,8 @@ public class SystemStatTask extends Task {
 
 		if(provider.getTotalSwapSize() > 0) {
 			int swapUsage = (int) ((provider.getUsedSwapSize()) * 100 / provider.getTotalSwapSize());
-			lines.add(
-					new Line("swap-usage", sysStatSecId,
+			contents.add(
+					new Content("swap-usage", sysStatSecId,
 							swapUsage + "% "
 									+ getFormattedSize(provider.getUsedSwapSize())
 									+ "/"
@@ -121,17 +120,17 @@ public class SystemStatTask extends Task {
 		if(uptime > 0){
 			uptimeString = uptime + "d " + uptimeString;
 		}
-		lines.add(new Line("uptime", sysStatSecId, uptimeString, "Uptime"));
+		contents.add(new Content("uptime", sysStatSecId, uptimeString, "Uptime"));
 
-		lines.add(new Line("temp", sysStatSecId, systemInfo.getHardware().getSensors().getCpuTemperature() + "'C", "Temp"));
+		contents.add(new Content("temp", sysStatSecId, systemInfo.getHardware().getSensors().getCpuTemperature() + "'C", "Temp"));
 
-		lines.add(new Line("thread-count", sysStatSecId, "" + systemInfo.getOperatingSystem().getThreadCount(), "Thread count"));
+		contents.add(new Content("thread-count", sysStatSecId, "" + systemInfo.getOperatingSystem().getThreadCount(), "Thread count"));
 
 		if (SystemUtils.IS_OS_LINUX && enableServicesStats) {
-			lines.addAll(getServicesStats());
+			contents.addAll(getServicesStats());
 		}
 
-		for (var l : lines) {
+		for (var l : contents) {
 			try {
 				MessagesController.handle(l);
 			} catch (IOException e) {
@@ -140,8 +139,8 @@ public class SystemStatTask extends Task {
 		}
 	}
 
-	private ArrayList<Line> getServicesStats() throws IOException {
-		ArrayList<Line> lines = new ArrayList<>();
+	private ArrayList<Content> getServicesStats() throws IOException {
+		ArrayList<Content> contents = new ArrayList<>();
 		for(var service : services){
 			String state = Utils.exec("systemctl is-active " + service.id())
 					.replace("\n", "");
@@ -168,9 +167,9 @@ public class SystemStatTask extends Task {
 					// ignore
 				}
 			}
-			lines.add(new Line(service.id(), "sys-stat", msg, service.name()));
+			contents.add(new Content(service.id(), "sys-stat", msg, service.name()));
 		}
-		return lines;
+		return contents;
 	}
 
 	public static String getFormattedSize(long size){

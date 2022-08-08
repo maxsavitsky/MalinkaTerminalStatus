@@ -54,7 +54,7 @@ Arguments:
 
         --services-list=<path>
                 This file describes the services whose status should be displayed.
-                Each service is described by a separate line in the format id:name
+                Each service is described by a separate content in the format id:name
                 id should be identifier of service in systemctl
                 Note: Works only on linux
 

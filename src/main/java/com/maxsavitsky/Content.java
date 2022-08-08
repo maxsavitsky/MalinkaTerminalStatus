@@ -1,6 +1,6 @@
 package com.maxsavitsky;
 
-public class Line {
+public class Content {
 
 	public static final String DELIMITER = "~#";
 
@@ -10,11 +10,11 @@ public class Line {
 	private String message;
 	private String label;
 
-	public Line(String tag, String sectionId, String message) {
+	public Content(String tag, String sectionId, String message) {
 		this(tag, sectionId, message, null);
 	}
 
-	public Line(String tag, String sectionId, String message, String label) {
+	public Content(String tag, String sectionId, String message, String label) {
 		this.tag = tag;
 		this.sectionId = sectionId;
 		this.message = message == null ? null : message.trim();
