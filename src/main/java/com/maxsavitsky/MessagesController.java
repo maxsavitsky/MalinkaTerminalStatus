@@ -1,55 +1,23 @@
 package com.maxsavitsky;
 
-import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.terminal.Terminal;
-import com.maxsavitsky.sections.Section;
+import com.maxsavitsky.manager.ContentDispatcher;
+import com.maxsavteam.ciconia.annotation.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
+@Component
 public class MessagesController {
 
-	private MessagesController(){}
+	private final ContentDispatcher contentDispatcher;
 
-	private static final ArrayList<Section> sections = new ArrayList<>();
-
-	private static Terminal terminal;
-
-	public static void addSection(Section section) {
-		sections.add(section);
+	public MessagesController(ContentDispatcher contentDispatcher, MessagesListener messagesListener) {
+		this.contentDispatcher = contentDispatcher;
+		MessagesListener.ListenerCallback listenerCallback = this::handleMessage;
+		messagesListener.fetchBuffer(listenerCallback);
+		messagesListener.addListener(listenerCallback);
 	}
 
-	public static void onTerminalSizeChange(Terminal terminal, TerminalSize terminalSize) {
-		for(Section section : sections){
-			try {
-				section.onTerminalSizeChange(terminal, terminalSize);
-			}catch (IOException e){
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public static void handle(Content l) throws IOException {
-		for (Section s : sections) {
-			if (s.getIdentifier().equals(l.getSectionId())) {
-				s.write(l, terminal);
-				terminal.flush();
-			}
-		}
-	}
-
-	public static void printMessage(String message) throws IOException {
-		handle(new Content(null, "msg", message));
-	}
-
-	public static void start(final Terminal terminal) {
-		MessagesController.terminal = terminal;
-		MessagesListener.ListenerCallback callback = MessagesController::handleMessage;
-		MessagesListener.getInstance().fetchBuffer(callback);
-		MessagesListener.getInstance().addListener(callback);
-	}
-
-	private static void handleMessage(String message) {
+	private void handleMessage(String message) {
 		String tag = null;
 		String msg = null;
 		String label = null;
@@ -74,7 +42,7 @@ public class MessagesController {
 		Content content = new Content(tag, secId, msg, label);
 
 		try {
-			handle(content);
+			contentDispatcher.dispatch(content);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

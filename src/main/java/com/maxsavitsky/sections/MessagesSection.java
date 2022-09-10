@@ -2,7 +2,6 @@ package com.maxsavitsky.sections;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.maxsavitsky.Content;
 
@@ -13,40 +12,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessagesSection extends Section {
-
-	private static MessagesSection instance;
-	private int columnsOffset;
-	private int rowsOffset;
-	private int columnsLimit;
-	private int rowsLimit;
 	private final ArrayList<Message> messages = new ArrayList<>();
 	private int currentLineIndex = 0;
 
-	public static MessagesSection getInstance() {
-		return instance;
-	}
-
-	public static MessagesSection init(TerminalScreen terminalScreen){
-		instance = new MessagesSection(terminalScreen);
-		return instance;
-	}
-
-	private MessagesSection(TerminalScreen terminalScreen){
-		changeSizes(terminalScreen.getTerminalSize());
-	}
-
-	private void changeSizes(TerminalSize terminalSize){
+	@Override
+	public SectionSize declareSize(TerminalSize terminalSize) {
 		int columns = terminalSize.getColumns();
 		int rows = terminalSize.getRows();
-		columnsOffset = columns / 2;
-		rowsOffset = 0;
-		columnsLimit = columns - columnsOffset;
-		rowsLimit = rows;
+		int offsetX = columns / 2;
+		int offsetY = 0;
+		int width = columns - offsetX;
+		return new SectionSize(
+				width,
+				rows,
+				offsetX,
+				offsetY
+		);
 	}
 
 	@Override
 	public void onTerminalSizeChange(Terminal terminal, TerminalSize newTerminalSize) throws IOException {
-		changeSizes(newTerminalSize);
 		rewrite(terminal);
 	}
 
@@ -64,11 +49,11 @@ public class MessagesSection extends Section {
 
 		Message message = new Message(fullMessage);
 		messages.add(message);
-		var messageParts = message.getMessageParts(columnsLimit);
-		int availableLines = rowsLimit - currentLineIndex + rowsOffset - 1;
+		var messageParts = message.getMessageParts(getLastDeclaredSize().getWidth());
+		int availableLines = getLastDeclaredSize().getHeight() - currentLineIndex;
 		if (availableLines >= messageParts.size()) {
 			for (int i = 0; i < messageParts.size(); i++, currentLineIndex++) {
-				terminal.setCursorPosition(new TerminalPosition(columnsOffset, currentLineIndex));
+				terminal.setCursorPosition(new TerminalPosition(0, currentLineIndex));
 				terminal.putString(messageParts.get(i));
 			}
 		} else {
@@ -77,40 +62,40 @@ public class MessagesSection extends Section {
 	}
 
 	private void rewrite(Terminal terminal) throws IOException {
-		currentLineIndex = rowsOffset;
+		SectionSize size = getLastDeclaredSize();
 		ArrayList<String> lines = new ArrayList<>();
 		for(Message m : messages){
-			List<String> messageParts = m.getMessageParts(columnsLimit);
+			List<String> messageParts = m.getMessageParts(size.getHeight());
 			lines.addAll(messageParts);
 		}
 		int offset = 0;
-		if(lines.size() > rowsLimit)
-			offset = lines.size() - rowsLimit;
+		if(lines.size() > size.getHeight()) // if we have more lines than we can display we draw from the end
+			offset = lines.size() - size.getHeight();
 		currentLineIndex = 0;
 		for(int i = offset; i < lines.size(); i++, currentLineIndex++){
-			terminal.setCursorPosition(new TerminalPosition(columnsOffset, currentLineIndex));
+			terminal.setCursorPosition(new TerminalPosition(0, currentLineIndex));
 			terminal.putString(lines.get(i));
-			clearLine(terminal, columnsLimit - lines.get(i).length());
+			clearLine(terminal, size.getWidth() - lines.get(i).length());
 		}
-		for(int j = currentLineIndex; j < rowsLimit; j++){
-			terminal.setCursorPosition(new TerminalPosition(columnsOffset, currentLineIndex));
-			clearLine(terminal, columnsLimit);
+		for(int j = currentLineIndex; j < size.getHeight(); j++){
+			terminal.setCursorPosition(new TerminalPosition(0, currentLineIndex));
+			clearLine(terminal, size.getWidth());
 		}
 	}
 
 	private void rewriteFromEnd(Terminal terminal) throws IOException {
-		int line = rowsLimit + rowsOffset - 1;
+		SectionSize size = getLastDeclaredSize();
+		int line = size.getHeight() - 1;
 		int messageIndex = messages.size() - 1;
-		while (line >= rowsOffset) {
+		while (line >= 0) {
 			Message m = messages.get(messageIndex);
-			List<String> parts = m.getMessageParts(columnsLimit);
-			for (int i = parts.size() - 1; i >= 0 && line >= rowsOffset; i--, line--) {
-				terminal.setCursorPosition(new TerminalPosition(columnsOffset, line));
+			List<String> parts = m.getMessageParts(size.getWidth());
+			for (int i = parts.size() - 1; i >= 0 && line >= 0; i--, line--) {
+				terminal.setCursorPosition(new TerminalPosition(0, line));
 				terminal.putString(parts.get(i));
-				clearLine(terminal, columnsLimit - parts.get(i).length());
+				clearLine(terminal, size.getWidth() - parts.get(i).length());
 			}
-			if (line >= rowsOffset)
-				messageIndex--;
+			messageIndex--;
 		}
 	}
 

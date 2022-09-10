@@ -2,8 +2,8 @@ package com.maxsavitsky.tasks;
 
 import com.maxsavitsky.Content;
 import com.maxsavitsky.Main;
-import com.maxsavitsky.MessagesController;
 import com.maxsavitsky.Utils;
+import com.maxsavitsky.manager.ContentDispatcher;
 import com.maxsavitsky.tasks.provider.SystemInfoProvider;
 import org.apache.commons.lang3.SystemUtils;
 import oshi.SystemInfo;
@@ -21,17 +21,18 @@ import java.util.List;
 
 public class SystemStatTask extends Task {
 
-	public static final long TIMER_PERIOD = 15000;
-
 	private final boolean enableServicesStats;
 	private final List<Service> services;
 
 	private final SystemInfoProvider provider;
 
-	public SystemStatTask(boolean enableServicesStats, List<Service> services, SystemInfoProvider provider) {
+	private final ContentDispatcher contentDispatcher;
+
+	public SystemStatTask(ContentDispatcher contentDispatcher, boolean enableServicesStats, List<Service> services, SystemInfoProvider provider) {
 		this.services = services;
 		this.enableServicesStats = enableServicesStats;
 		this.provider = provider;
+		this.contentDispatcher = contentDispatcher;
 	}
 
 	@Override
@@ -132,7 +133,7 @@ public class SystemStatTask extends Task {
 
 		for (var l : contents) {
 			try {
-				MessagesController.handle(l);
+				contentDispatcher.dispatch(l);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

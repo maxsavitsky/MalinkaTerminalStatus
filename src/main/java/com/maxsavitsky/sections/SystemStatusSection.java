@@ -2,7 +2,6 @@ package com.maxsavitsky.sections;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.maxsavitsky.Content;
 
@@ -11,31 +10,26 @@ import java.util.ArrayList;
 
 public class SystemStatusSection extends Section {
 
-	private int rowsOffset;
-	private int columnsOffset;
-
-	private int rowsLimit;
-	private int columnsLimit;
-
 	private final ArrayList<Content> contents = new ArrayList<>();
-
-	public SystemStatusSection(TerminalScreen terminalScreen){
-		changeSize(terminalScreen.getTerminalSize());
-	}
 
 	@Override
 	public void onTerminalSizeChange(Terminal terminal, TerminalSize newTerminalSize) throws IOException {
-		changeSize(newTerminalSize);
 		rewrite(terminal);
 	}
 
-	private void changeSize(TerminalSize terminalSize){
+	@Override
+	public SectionSize declareSize(TerminalSize terminalSize) {
 		int columns = terminalSize.getColumns();
 		int rows = terminalSize.getRows();
-		rowsOffset = 0;
-		columnsOffset = 0;
-		rowsLimit = rows;
-		columnsLimit = columns / 2;
+		int offsetX = 0;
+		int offsetY = 0;
+		int width = columns / 2;
+		return new SectionSize(
+				width,
+				rows,
+				offsetX,
+				offsetY
+		);
 	}
 
 	@Override
@@ -58,9 +52,6 @@ public class SystemStatusSection extends Section {
 			lineIndex = contents.size();
 			contents.add(line);
 		}
-		lineIndex += rowsOffset;
-
-		terminal.setCursorPosition(new TerminalPosition(columnsOffset, lineIndex));
 
 		String content;
 		if (line.getLabel() != null && line.getMessage() != null) {
@@ -68,19 +59,20 @@ public class SystemStatusSection extends Section {
 		} else {
 			content = line.getLabel() == null ? line.getMessage() : line.getLabel();
 		}
-		if(content.length() > columnsLimit)
-			content = content.substring(0, columnsLimit);
+		if(content.length() > getLastDeclaredSize().getWidth())
+			content = content.substring(0, getLastDeclaredSize().getWidth());
+
+		terminal.setCursorPosition(new TerminalPosition(0, lineIndex));
 		terminal.putString(content);
-		clearLine(terminal, columnsLimit - content.length());
 	}
 
 	private void rewrite(Terminal terminal) throws IOException {
 		for(Content content : contents){
 			write(content, terminal);
 		}
-		for(int j = contents.size(); j < rowsLimit; j++){
-			terminal.setCursorPosition(new TerminalPosition(columnsOffset, j));
-			clearLine(terminal, columnsLimit);
+		for(int j = contents.size(); j < getLastDeclaredSize().getHeight(); j++){
+			terminal.setCursorPosition(new TerminalPosition(0, j));
+			clearLine(terminal, getLastDeclaredSize().getWidth());
 		}
 	}
 }

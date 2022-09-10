@@ -2,24 +2,20 @@ package com.maxsavitsky.keybinder;
 
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.screen.TerminalScreen;
+import com.maxsavteam.ciconia.annotation.Component;
 
 import java.io.IOException;
 
+@Component
 public class KeyHandler {
 
-	private static KeyHandler instance;
-
-	public static void start(Terminal terminal){
-		instance = new KeyHandler(terminal);
-	}
-
-	private KeyHandler(Terminal terminal){
+	public void listen(TerminalScreen terminalScreen, OnTerminalShutdownCallback onTerminalShutdownCallback) {
 		new Thread(()->{
 			while(true){
 				try {
-					KeyStroke keyStroke = terminal.readInput();
-					processKeyStroke(keyStroke);
+					KeyStroke keyStroke = terminalScreen.getTerminal().readInput();
+					processKeyStroke(keyStroke, terminalScreen, onTerminalShutdownCallback);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -27,8 +23,19 @@ public class KeyHandler {
 		}).start();
 	}
 
-	private void processKeyStroke(KeyStroke keyStroke){
-		KeyProcessor.getInstance().process(keyStroke);
+	private void processKeyStroke(KeyStroke keyStroke, TerminalScreen terminalScreen, OnTerminalShutdownCallback onTerminalShutdownCallback){
+		if(isShutdownKeyStroke(keyStroke)){
+			onTerminalShutdownCallback.onTerminalShutdown(terminalScreen);
+		}
+	}
+
+	private boolean isShutdownKeyStroke(KeyStroke keyStroke) {
+		return keyStroke.getKeyType() == KeyType.Character && keyStroke.getCharacter() == 'x' && keyStroke.isCtrlDown()
+				|| keyStroke.getKeyType() == KeyType.Escape;
+	}
+
+	public interface OnTerminalShutdownCallback {
+		void onTerminalShutdown(TerminalScreen terminalScreen);
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.maxsavitsky;
 
+import com.maxsavteam.ciconia.annotation.Component;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,20 +9,17 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+@Component
 public class MessagesListener {
 
 	private static final int BUFFER_MAX_SIZE = 100;
-	private static MessagesListener instance;
 	private final ArrayList<String> buffer = new ArrayList<>();
 	private final ArrayList<ListenerCallback> listenerCallbacks = new ArrayList<>();
 	private ServerSocket serverSocket;
 	private final static Object BUFFER_LOCK = new Object();
 
-	public static void init(int port){
-		instance = new MessagesListener(port);
-	}
-
-	private MessagesListener(int port) {
+	public MessagesListener() {
+		int port = Main.getProgramArguments().getPort();
 		new Thread(() -> {
 			try {
 				serverSocket = new ServerSocket(port);
@@ -28,8 +27,7 @@ public class MessagesListener {
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
-			String msg = "Socket started after " + (System.currentTimeMillis() - Main.getStartTime()) / 1000.0 + " seconds";
-			addToBuffer("tag=t~#sec=msg~#msg=" + msg);
+
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
 
@@ -47,10 +45,6 @@ public class MessagesListener {
 
 			}
 		}).start();
-	}
-
-	public static MessagesListener getInstance() {
-		return instance;
 	}
 
 	public void addListener(ListenerCallback callback) {

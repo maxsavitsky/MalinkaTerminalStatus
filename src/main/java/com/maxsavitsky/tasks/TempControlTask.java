@@ -3,8 +3,8 @@ package com.maxsavitsky.tasks;
 import com.maxsavitsky.Content;
 import com.maxsavitsky.MailSender;
 import com.maxsavitsky.Main;
-import com.maxsavitsky.MessagesController;
 import com.maxsavitsky.Utils;
+import com.maxsavitsky.manager.ContentDispatcher;
 import oshi.SystemInfo;
 
 import javax.mail.MessagingException;
@@ -18,8 +18,14 @@ public class TempControlTask extends Task {
 
 	private long lastTemperaturePrintTime = 0;
 
+	private final ContentDispatcher contentDispatcher;
+
+	public TempControlTask(ContentDispatcher contentDispatcher) {
+		this.contentDispatcher = contentDispatcher;
+	}
+
 	private void printMessage(String message) throws IOException {
-		MessagesController.handle(new Content(
+		contentDispatcher.dispatch(new Content(
 				null,
 				"msg",
 				message
