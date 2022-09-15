@@ -79,7 +79,7 @@ public class MailSender {
 		Message message = new SMTPMessage(session);
 		message.setFrom(new InternetAddress(mail));
 
-		for(var i : internetAddresses)
+		for(InternetAddress i : internetAddresses)
 			message.setRecipient(Message.RecipientType.TO, i);
 		message.setSubject(title);
 		message.setContent(msg, "text/plain");

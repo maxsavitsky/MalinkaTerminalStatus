@@ -45,15 +45,41 @@ public class TerminalScreensManager {
 	}
 
 	public void dispatch(Content content) throws IOException {
+		synchronized (entities){
+			dispatchInternal(content);
+		}
+	}
+
+	public void dispatch(List<Content> contents){
+		synchronized (entities){
+			for(Content content : contents){
+				try {
+					dispatchInternal(content);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	private void dispatchInternal(Content content) throws IOException {
 		for(Entity entity : entities){
 			TerminalScreen screen = entity.terminalScreen;
 			SectionsManager manager = entity.sectionsManager;
 			manager.dispatch(content, screen.getTerminal());
-			screen.refresh();
+			screen.refresh(Screen.RefreshType.DELTA);
 		}
 	}
 
-	private record Entity(SectionsManager sectionsManager, TerminalScreen terminalScreen) {
+	private static class Entity {
+
+		private final SectionsManager sectionsManager;
+		private final TerminalScreen terminalScreen;
+
+		public Entity(SectionsManager sectionsManager, TerminalScreen terminalScreen) {
+			this.sectionsManager = sectionsManager;
+			this.terminalScreen = terminalScreen;
+		}
 	}
 
 }

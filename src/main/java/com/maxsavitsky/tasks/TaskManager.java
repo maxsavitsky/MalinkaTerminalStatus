@@ -4,8 +4,8 @@ import com.maxsavteam.ciconia.annotation.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,7 +23,7 @@ public class TaskManager {
 			return;
 		}
 
-		tasksHashMap.put(period, new ArrayList<>(List.of(task)));
+		tasksHashMap.put(period, new ArrayList<>(Collections.singletonList(task)));
 
 		Timer timer = new Timer(true);
 		timer.schedule(new TimerTask() {

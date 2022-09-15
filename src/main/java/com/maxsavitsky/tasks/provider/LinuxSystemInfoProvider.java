@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LinuxSystemInfoProvider implements SystemInfoProvider {
 
@@ -44,10 +46,10 @@ public class LinuxSystemInfoProvider implements SystemInfoProvider {
 
 	private double[][] parseCpuFromProcStat() throws IOException {
 		// see about /proc/stat
-		var list = Files.readAllLines(new File("/proc/stat").toPath())
+		List<String> list = Files.readAllLines(new File("/proc/stat").toPath())
 				.stream()
 				.filter(line -> line.startsWith("cpu"))
-				.toList();
+				.collect(Collectors.toList());
 		double[][] cpuLoad = new double[list.size()][10];
 		for (int i = 0; i < list.size(); i++) {
 			String[] parts = list.get(i).split("\\s+");
@@ -141,7 +143,18 @@ public class LinuxSystemInfoProvider implements SystemInfoProvider {
 		);
 	}
 
-	private record RamData(long total, long used, long free, long usedCache, long available) {}
+	private static class RamData {
+
+		private final long total, used, free, usedCache, available;
+
+		public RamData(long total, long used, long free, long usedCache, long available) {
+			this.total = total;
+			this.used = used;
+			this.free = free;
+			this.usedCache = usedCache;
+			this.available = available;
+		}
+	}
 
 	private SwapData parseSwapData(String line){
 		final int totalIndex = 1;
@@ -153,6 +166,15 @@ public class LinuxSystemInfoProvider implements SystemInfoProvider {
 		);
 	}
 
-	private record SwapData(long total, long used) {}
+	private static class SwapData {
+
+		private final long total, used;
+
+		public SwapData(long total, long used) {
+			this.total = total;
+			this.used = used;
+		}
+
+	}
 
 }

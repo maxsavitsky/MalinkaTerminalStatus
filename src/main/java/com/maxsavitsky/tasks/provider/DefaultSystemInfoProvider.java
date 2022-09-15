@@ -13,7 +13,7 @@ public class DefaultSystemInfoProvider implements SystemInfoProvider {
 	@Override
 	public double[] getCoresLoad() {
 		return new double[]{
-				osBean.getCpuLoad()
+				osBean.getSystemCpuLoad()
 		};
 	}
 
@@ -24,12 +24,12 @@ public class DefaultSystemInfoProvider implements SystemInfoProvider {
 
 	@Override
 	public long getTotalMemorySize() {
-		return osBean.getTotalMemorySize();
+		return osBean.getTotalPhysicalMemorySize();
 	}
 
 	@Override
 	public long getUsedMemorySize() {
-		return osBean.getTotalMemorySize() - osBean.getFreeMemorySize();
+		return osBean.getTotalPhysicalMemorySize() - osBean.getFreePhysicalMemorySize();
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class DefaultSystemInfoProvider implements SystemInfoProvider {
 
 	@Override
 	public long getFreeMemorySize() {
-		return osBean.getFreeMemorySize();
+		return osBean.getFreePhysicalMemorySize();
 	}
 
 	@Override

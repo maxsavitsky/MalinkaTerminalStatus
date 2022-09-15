@@ -67,7 +67,7 @@ public class MessagesListener {
 	}
 
 	public void handle(String s) {
-		for (var callback : listenerCallbacks)
+		for (ListenerCallback callback : listenerCallbacks)
 			callback.onMessage(s);
 	}
 

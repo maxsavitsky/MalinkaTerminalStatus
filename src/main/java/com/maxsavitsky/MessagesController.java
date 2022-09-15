@@ -32,10 +32,18 @@ public class MessagesController {
 				String id = s.substring(0, p);
 				String content = s.substring(p + 1);
 				switch (id) {
-					case "tag" -> tag = content;
-					case "lbl" -> label = content;
-					case "msg" -> msg = content;
-					case "sec" -> secId = content;
+					case "tag":
+						tag = content;
+						break;
+					case "lbl":
+						label = content;
+						break;
+					case "msg":
+						msg = content;
+						break;
+					case "sec":
+						secId = content;
+						break;
 				}
 			}
 		}

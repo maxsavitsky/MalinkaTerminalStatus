@@ -10,5 +10,8 @@
         <module name="MalinkaTerminalStatus" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="connector" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

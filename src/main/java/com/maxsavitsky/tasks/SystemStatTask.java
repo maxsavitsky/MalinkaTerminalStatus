@@ -2,35 +2,24 @@ package com.maxsavitsky.tasks;
 
 import com.maxsavitsky.Content;
 import com.maxsavitsky.Main;
-import com.maxsavitsky.Utils;
 import com.maxsavitsky.manager.ContentDispatcher;
 import com.maxsavitsky.tasks.provider.SystemInfoProvider;
-import org.apache.commons.lang3.SystemUtils;
 import oshi.SystemInfo;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class SystemStatTask extends Task {
-
-	private final boolean enableServicesStats;
-	private final List<Service> services;
 
 	private final SystemInfoProvider provider;
 
 	private final ContentDispatcher contentDispatcher;
 
-	public SystemStatTask(ContentDispatcher contentDispatcher, boolean enableServicesStats, List<Service> services, SystemInfoProvider provider) {
-		this.services = services;
-		this.enableServicesStats = enableServicesStats;
+	public SystemStatTask(ContentDispatcher contentDispatcher, SystemInfoProvider provider) {
 		this.provider = provider;
 		this.contentDispatcher = contentDispatcher;
 	}
@@ -127,50 +116,7 @@ public class SystemStatTask extends Task {
 
 		contents.add(new Content("thread-count", sysStatSecId, "" + systemInfo.getOperatingSystem().getThreadCount(), "Thread count"));
 
-		if (SystemUtils.IS_OS_LINUX && enableServicesStats) {
-			contents.addAll(getServicesStats());
-		}
-
-		for (var l : contents) {
-			try {
-				contentDispatcher.dispatch(l);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private ArrayList<Content> getServicesStats() throws IOException {
-		ArrayList<Content> contents = new ArrayList<>();
-		for(var service : services){
-			String state = Utils.exec("systemctl is-active " + service.id())
-					.replace("\n", "");
-			String status = Utils.exec("systemctl status %s".formatted(service.id()));
-			Process process = Runtime.getRuntime().exec("grep Memory");
-			OutputStream os = process.getOutputStream();
-			os.write(status.getBytes(StandardCharsets.UTF_8));
-			os.flush();
-			os.close();
-
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			process.getInputStream().transferTo(bos);
-
-			String memoryStr = bos.toString();
-
-			String msg = state;
-			if (memoryStr.length() > 0) {
-				String[] p = memoryStr.split(":");
-				String s = p[1].replace("\n", "").trim();
-				try {
-					Double.parseDouble(s.substring(0, s.length() - 1));
-					msg += " " + s;
-				} catch (NumberFormatException ignored) {
-					// ignore
-				}
-			}
-			contents.add(new Content(service.id(), "sys-stat", msg, service.name()));
-		}
-		return contents;
+		contentDispatcher.dispatch(contents);
 	}
 
 	public static String getFormattedSize(long size){
@@ -193,9 +139,6 @@ public class SystemStatTask extends Task {
 			usedString = usedString.substring(0, usedString.length() - 3);
 		}
 		return usedString + v;
-	}
-
-	public record Service(String id, String name){
 	}
 
 }

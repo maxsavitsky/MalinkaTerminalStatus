@@ -73,11 +73,20 @@ public class TempControlTask extends Task {
 	}
 
 	private String getShutdownCommand() {
-		return switch (SystemInfo.getCurrentPlatform()) {
-			case LINUX, MACOS, FREEBSD, KFREEBSD, NETBSD, OPENBSD -> "shutdown -h now";
-			case WINDOWS, WINDOWSCE -> "shutdown /s /f /t 5";
-			default -> null;
-		};
+		switch (SystemInfo.getCurrentPlatform()) {
+			case OPENBSD:
+			case NETBSD:
+			case KFREEBSD:
+			case FREEBSD:
+			case MACOS:
+			case LINUX:
+				return "shutdown -h now";
+			case WINDOWS:
+			case WINDOWSCE:
+				return "shutdown /s /f /t 5";
+			default:
+				return null;
+		}
 	}
 
 

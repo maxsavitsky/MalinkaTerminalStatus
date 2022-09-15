@@ -49,7 +49,7 @@ public class MessagesSection extends Section {
 
 		Message message = new Message(fullMessage);
 		messages.add(message);
-		var messageParts = message.getMessageParts(getLastDeclaredSize().getWidth());
+		List<String> messageParts = message.getMessageParts(getLastDeclaredSize().getWidth());
 		int availableLines = getLastDeclaredSize().getHeight() - currentLineIndex;
 		if (availableLines >= messageParts.size()) {
 			for (int i = 0; i < messageParts.size(); i++, currentLineIndex++) {

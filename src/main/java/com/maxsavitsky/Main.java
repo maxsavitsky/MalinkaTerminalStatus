@@ -1,6 +1,6 @@
 package com.maxsavitsky;
 
-import com.maxsavitsky.tasks.SystemStatTask;
+import com.maxsavitsky.tasks.ServicesStatsTask;
 import com.maxsavitsky.tasks.provider.DefaultSystemInfoProvider;
 import com.maxsavitsky.tasks.provider.LinuxSystemInfoProvider;
 import com.maxsavitsky.tasks.provider.SystemInfoProvider;
@@ -13,6 +13,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,9 +59,9 @@ public class Main {
 		return new DefaultSystemInfoProvider();
 	}
 
-	public static List<SystemStatTask.Service> getServicesFromFile(String path){
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path)))){
-			ArrayList<SystemStatTask.Service> services = new ArrayList<>();
+	public static List<ServicesStatsTask.Service> getServicesFromFile(String path){
+		try(BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(path))))){
+			List<ServicesStatsTask.Service> services = new ArrayList<>();
 			String content = reader.readLine();
 			int lineIndex = 1;
 			while(content != null){
@@ -71,7 +73,7 @@ public class Main {
 				}
 				String serviceId = content.substring(0, p);
 				String serviceName = content.substring(p + 1);
-				services.add(new SystemStatTask.Service(serviceId, serviceName));
+				services.add(new ServicesStatsTask.Service(serviceId, serviceName));
 
 				content = reader.readLine();
 				lineIndex++;
