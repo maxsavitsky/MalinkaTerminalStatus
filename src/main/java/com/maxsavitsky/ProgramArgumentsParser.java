@@ -74,9 +74,13 @@ public class ProgramArgumentsParser {
 					programArguments.setSource(new NetworkSource(parts[0], Integer.parseInt(parts[1])));
 				}
 			} else if(argName.equals("api-port")) {
-				if(value == null)
+				if (value == null)
 					throw new IllegalArgumentException("API port must be specified");
 				programArguments.setApiPort(Integer.parseInt(value));
+			} else if(argName.equals("messages-broadcasting-port")) {
+				if(value == null)
+					throw new IllegalArgumentException("Messages broadcasting port must be specified");
+				programArguments.setMessagesBroadcastingPort(Integer.parseInt(value));
 			} else {
 				throw new IllegalArgumentException("Unknown argument '" + argName + "'");
 			}

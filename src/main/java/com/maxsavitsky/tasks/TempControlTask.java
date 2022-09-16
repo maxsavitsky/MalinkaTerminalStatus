@@ -1,10 +1,9 @@
 package com.maxsavitsky.tasks;
 
-import com.maxsavitsky.Content;
 import com.maxsavitsky.MailSender;
 import com.maxsavitsky.Main;
 import com.maxsavitsky.Utils;
-import com.maxsavitsky.manager.ContentDispatcher;
+import com.maxsavitsky.manager.MessagesDispatcher;
 import oshi.SystemInfo;
 
 import javax.mail.MessagingException;
@@ -18,18 +17,14 @@ public class TempControlTask extends Task {
 
 	private long lastTemperaturePrintTime = 0;
 
-	private final ContentDispatcher contentDispatcher;
+	private final MessagesDispatcher messagesDispatcher;
 
-	public TempControlTask(ContentDispatcher contentDispatcher) {
-		this.contentDispatcher = contentDispatcher;
+	public TempControlTask(MessagesDispatcher messagesDispatcher) {
+		this.messagesDispatcher = messagesDispatcher;
 	}
 
-	private void printMessage(String message) throws IOException {
-		contentDispatcher.dispatch(new Content(
-				null,
-				"msg",
-				message
-		));
+	private void printMessage(String message) {
+		messagesDispatcher.handleAndPrintMessage(message);
 	}
 
 	private void sendMail(String title, String message) {

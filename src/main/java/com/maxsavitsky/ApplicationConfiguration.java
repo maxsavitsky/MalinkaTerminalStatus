@@ -1,12 +1,11 @@
 package com.maxsavitsky;
 
 import com.maxsavitsky.manager.ContentDispatcher;
+import com.maxsavitsky.manager.MessagesDispatcher;
 import com.maxsavitsky.source.NetworkSource;
 import com.maxsavitsky.tasks.ServicesStatsTask;
 import com.maxsavitsky.tasks.SystemStatTask;
 import com.maxsavitsky.tasks.TempControlTask;
-import com.maxsavitsky.tasks.provider.service.DefaultServicesInfoProvider;
-import com.maxsavitsky.tasks.provider.service.LinuxServicesInfoProvider;
 import com.maxsavitsky.tasks.provider.service.NetworkServicesInfoProvider;
 import com.maxsavitsky.tasks.provider.service.ServicesInfoProvider;
 import com.maxsavitsky.tasks.provider.system.NetworkSystemInfoProvider;
@@ -35,8 +34,8 @@ public class ApplicationConfiguration {
 	}
 
 	@ObjectFactory
-	public TempControlTask createTempControlTask(ContentDispatcher contentDispatcher){
-		return new TempControlTask(contentDispatcher);
+	public TempControlTask createTempControlTask(MessagesDispatcher messagesDispatcher){
+		return new TempControlTask(messagesDispatcher);
 	}
 
 	@ObjectFactory

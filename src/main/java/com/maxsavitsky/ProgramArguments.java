@@ -18,6 +18,7 @@ public class ProgramArguments {
 	private String beforeShutdownCommand = null;
 	private int port = 8000;
 	private int apiPort = 22800;
+	private int messagesBroadcastingPort = 22801;
 	private String pathToServicesList = null;
 	private String mailPropertiesFile = null;
 

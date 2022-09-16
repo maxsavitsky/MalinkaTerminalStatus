@@ -3,11 +3,14 @@ package com.maxsavitsky;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.maxsavitsky.manager.MessagesDispatcher;
 import com.maxsavitsky.manager.SectionsManager;
 import com.maxsavitsky.manager.TerminalScreensManager;
 import com.maxsavitsky.sections.MessagesSection;
 import com.maxsavitsky.sections.Section;
 import com.maxsavitsky.sections.SystemStatusSection;
+import com.maxsavitsky.source.NetworkSource;
+import com.maxsavitsky.source.Source;
 import com.maxsavitsky.tasks.ServicesStatsTask;
 import com.maxsavitsky.tasks.SystemStatTask;
 import com.maxsavitsky.tasks.TaskManager;
@@ -44,6 +47,18 @@ public class PostInitializationConfiguration {
 		Terminal terminal = terminalScreen.getTerminal();
 		terminal.setCursorVisible(false);
 		return terminalScreen;
+	}
+
+	@PostInitialization(order = 1)
+	public void startMessageBroadcastsListenerIfNeeded(MessagesDispatcher dispatcher) throws IOException {
+		Source source = Main.getProgramArguments().getSource();
+		if(!(source instanceof NetworkSource))
+			return;
+
+		NetworkSource networkSource = (NetworkSource) source;
+
+		int broadcastingPort = Integer.parseInt(networkSource.request("/messages-broadcasting-port"));
+		new MessagesBroadcastsListener(dispatcher, broadcastingPort);
 	}
 
 	@PostInitialization(order = 1)
