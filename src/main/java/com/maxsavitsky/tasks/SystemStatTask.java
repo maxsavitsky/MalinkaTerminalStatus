@@ -1,10 +1,8 @@
 package com.maxsavitsky.tasks;
 
 import com.maxsavitsky.Content;
-import com.maxsavitsky.Main;
 import com.maxsavitsky.manager.ContentDispatcher;
 import com.maxsavitsky.tasks.provider.system.SystemInfoProvider;
-import oshi.SystemInfo;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -95,8 +93,7 @@ public class SystemStatTask extends Task {
 			);
 		}
 
-		SystemInfo systemInfo = Main.getSystemInfo();
-		long uptime = systemInfo.getOperatingSystem().getSystemUptime();
+		long uptime = provider.getUptime();
 		String uptimeString = (uptime % 60) + "s";
 		uptime /= 60;
 		if(uptime > 0){
@@ -112,9 +109,9 @@ public class SystemStatTask extends Task {
 		}
 		contents.add(new Content("uptime", sysStatSecId, uptimeString, "Uptime"));
 
-		contents.add(new Content("temp", sysStatSecId, systemInfo.getHardware().getSensors().getCpuTemperature() + "'C", "Temp"));
+		contents.add(new Content("temp", sysStatSecId, provider.getCpuTemperature() + "'C", "Temp"));
 
-		contents.add(new Content("thread-count", sysStatSecId, "" + systemInfo.getOperatingSystem().getThreadCount(), "Thread count"));
+		contents.add(new Content("thread-count", sysStatSecId, "" + provider.getThreadCount(), "Thread count"));
 
 		contentDispatcher.dispatch(contents);
 	}

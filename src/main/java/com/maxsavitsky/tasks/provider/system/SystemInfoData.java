@@ -17,6 +17,8 @@ public class SystemInfoData {
 	private long availableMemorySize;
 	private long totalSwapSize;
 	private long usedSwapSize;
+	private int threadCount;
+	private long uptime;
 
 	public static SystemInfoData parse(JSONObject jsonObject){
 		SystemInfoData systemInfoData = new SystemInfoData();
@@ -32,6 +34,8 @@ public class SystemInfoData {
 		systemInfoData.availableMemorySize = jsonObject.getLong( "availableMemorySize" );
 		systemInfoData.totalSwapSize = jsonObject.getLong( "totalSwapSize" );
 		systemInfoData.usedSwapSize = jsonObject.getLong( "usedSwapSize" );
+		systemInfoData.threadCount = jsonObject.getInt( "threadCount" );
+		systemInfoData.uptime = jsonObject.getLong( "uptime" );
 		return systemInfoData;
 	}
 

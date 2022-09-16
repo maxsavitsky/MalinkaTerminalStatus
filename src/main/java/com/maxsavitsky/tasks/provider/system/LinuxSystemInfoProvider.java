@@ -1,6 +1,7 @@
 package com.maxsavitsky.tasks.provider.system;
 
 import com.maxsavitsky.Utils;
+import oshi.SystemInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LinuxSystemInfoProvider implements SystemInfoProvider {
+
+	private final SystemInfo systemInfo = new SystemInfo();
 
 	private RamData ramData;
 
@@ -88,7 +91,7 @@ public class LinuxSystemInfoProvider implements SystemInfoProvider {
 
 	@Override
 	public double getCpuTemperature() {
-		return 0;
+		return systemInfo.getHardware().getSensors().getCpuTemperature();
 	}
 
 	@Override
@@ -124,6 +127,16 @@ public class LinuxSystemInfoProvider implements SystemInfoProvider {
 	@Override
 	public long getUsedSwapSize() {
 		return swapData.used;
+	}
+
+	@Override
+	public int getThreadCount() {
+		return systemInfo.getOperatingSystem().getThreadCount();
+	}
+
+	@Override
+	public long getUptime() {
+		return systemInfo.getOperatingSystem().getSystemUptime();
 	}
 
 	private RamData parseRamData(String line){

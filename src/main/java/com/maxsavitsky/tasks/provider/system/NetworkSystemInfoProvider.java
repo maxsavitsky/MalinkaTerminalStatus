@@ -66,4 +66,13 @@ public class NetworkSystemInfoProvider implements SystemInfoProvider {
 		return lastFetchedData.getUsedSwapSize();
 	}
 
+	@Override
+	public int getThreadCount() {
+		return lastFetchedData.getThreadCount();
+	}
+
+	@Override
+	public long getUptime() {
+		return lastFetchedData.getUptime();
+	}
 }

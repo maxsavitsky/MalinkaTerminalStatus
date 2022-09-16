@@ -1,10 +1,13 @@
 package com.maxsavitsky.tasks.provider.system;
 
+import oshi.SystemInfo;
+
 import java.lang.management.ManagementFactory;
 
 public class DefaultSystemInfoProvider implements SystemInfoProvider {
 
 	private final com.sun.management.OperatingSystemMXBean osBean;
+	private final SystemInfo systemInfo = new SystemInfo();
 
 	public DefaultSystemInfoProvider(){
 		osBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -19,7 +22,7 @@ public class DefaultSystemInfoProvider implements SystemInfoProvider {
 
 	@Override
 	public double getCpuTemperature() {
-		return -1;
+		return systemInfo.getHardware().getSensors().getCpuTemperature();
 	}
 
 	@Override
@@ -55,5 +58,15 @@ public class DefaultSystemInfoProvider implements SystemInfoProvider {
 	@Override
 	public long getUsedSwapSize() {
 		return osBean.getTotalSwapSpaceSize() - osBean.getFreeSwapSpaceSize();
+	}
+
+	@Override
+	public int getThreadCount() {
+		return systemInfo.getOperatingSystem().getThreadCount();
+	}
+
+	@Override
+	public long getUptime() {
+		return systemInfo.getOperatingSystem().getSystemUptime();
 	}
 }

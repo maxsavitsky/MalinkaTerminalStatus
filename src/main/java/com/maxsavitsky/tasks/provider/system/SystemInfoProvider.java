@@ -24,6 +24,10 @@ public interface SystemInfoProvider {
 
 	long getUsedSwapSize();
 
+	int getThreadCount();
+
+	long getUptime();
+
 	default SystemInfoData toData(){
 		SystemInfoData data = new SystemInfoData();
 		data.setCoresLoad( getCoresLoad() );
@@ -35,6 +39,8 @@ public interface SystemInfoProvider {
 		data.setAvailableMemorySize( getAvailableMemorySize() );
 		data.setTotalSwapSize( getTotalSwapSize() );
 		data.setUsedSwapSize( getUsedSwapSize() );
+		data.setThreadCount( getThreadCount() );
+		data.setUptime( getUptime() );
 		return data;
 	}
 
