@@ -3,7 +3,7 @@ package com.maxsavitsky.tasks;
 import com.maxsavitsky.Content;
 import com.maxsavitsky.Main;
 import com.maxsavitsky.manager.ContentDispatcher;
-import com.maxsavitsky.tasks.provider.SystemInfoProvider;
+import com.maxsavitsky.tasks.provider.system.SystemInfoProvider;
 import oshi.SystemInfo;
 
 import java.io.IOException;

@@ -1,12 +1,17 @@
 package com.maxsavitsky;
 
 import com.maxsavitsky.manager.ContentDispatcher;
+import com.maxsavitsky.source.NetworkSource;
 import com.maxsavitsky.tasks.ServicesStatsTask;
 import com.maxsavitsky.tasks.SystemStatTask;
 import com.maxsavitsky.tasks.TempControlTask;
 import com.maxsavitsky.tasks.provider.service.DefaultServicesInfoProvider;
 import com.maxsavitsky.tasks.provider.service.LinuxServicesInfoProvider;
 import com.maxsavitsky.tasks.provider.service.ServiceInfoProvider;
+import com.maxsavitsky.tasks.provider.system.DefaultSystemInfoProvider;
+import com.maxsavitsky.tasks.provider.system.LinuxSystemInfoProvider;
+import com.maxsavitsky.tasks.provider.system.NetworkSystemInfoProvider;
+import com.maxsavitsky.tasks.provider.system.SystemInfoProvider;
 import com.maxsavteam.ciconia.annotation.Configuration;
 import com.maxsavteam.ciconia.annotation.ObjectFactory;
 import org.apache.commons.lang3.SystemUtils;
@@ -19,7 +24,13 @@ public class ApplicationConfiguration {
 
 	@ObjectFactory
 	public SystemStatTask createSystemStatTask(ContentDispatcher contentDispatcher){
-		return new SystemStatTask(contentDispatcher, Main.getSystemInfoProvider());
+		return new SystemStatTask(contentDispatcher, getSystemInfoProvider());
+	}
+
+	private SystemInfoProvider getSystemInfoProvider(){
+		if(Main.getProgramArguments().getSource() instanceof NetworkSource)
+			return new NetworkSystemInfoProvider((NetworkSource) Main.getProgramArguments().getSource());
+		return Main.getLocalSystemInfoProvider();
 	}
 
 	@ObjectFactory

@@ -1,2 +1,2 @@
-scp F:\JavaProjects\MalinkaTerminalStatus\out\com\max\MalinkaTerminalStatus\1.0\MalinkaTerminalStatus-1.0.jar malinka@192.168.100.56:/drives/Media1/terminal-status/terminal-status_replace.jar
-plink -batch -pw %MALINKA_PASS% malinka@192.168.100.56 -m commands.txt
+call f:\malinka_scripts\upload.bat F:\JavaProjects\MalinkaTerminalStatus\build\libs\archive.jar /drives/Media1/terminal-status/terminal-status.jar
+call f:\malinka_scripts\restart-service.bat term-status

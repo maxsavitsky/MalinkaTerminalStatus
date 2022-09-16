@@ -1,5 +1,7 @@
 package com.maxsavitsky;
 
+import com.maxsavitsky.source.LocalSource;
+import com.maxsavitsky.source.Source;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +17,7 @@ public class ProgramArguments {
 	private String afterStartupCommand = null;
 	private String beforeShutdownCommand = null;
 	private int port = 8000;
+	private int apiPort = 22800;
 	private String pathToServicesList = null;
 	private String mailPropertiesFile = null;
 
@@ -23,5 +26,7 @@ public class ProgramArguments {
 
 	private InputStream inputStream = System.in;
 	private OutputStream outputStream = System.out;
+
+	private Source source = new LocalSource();
 
 }

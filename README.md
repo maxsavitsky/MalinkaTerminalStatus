@@ -43,7 +43,7 @@ Arguments:
                 Default is 15
 
         --execute-after-startup=<command>
-                This command will be executed after terminal will be ready to display data.
+                This command will be executed after terminal will be ready to display systemInfoData.
                 
         --execute-before-shutdown=<command>
                 This command will be executed before terminal will be closed.

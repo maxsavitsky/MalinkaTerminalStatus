@@ -1,16 +1,21 @@
 package com.maxsavitsky;
 
 import com.maxsavitsky.tasks.ServicesStatsTask;
-import com.maxsavitsky.tasks.provider.DefaultSystemInfoProvider;
-import com.maxsavitsky.tasks.provider.LinuxSystemInfoProvider;
-import com.maxsavitsky.tasks.provider.SystemInfoProvider;
+import com.maxsavitsky.tasks.provider.system.DefaultSystemInfoProvider;
+import com.maxsavitsky.tasks.provider.system.LinuxSystemInfoProvider;
+import com.maxsavitsky.tasks.provider.system.SystemInfoProvider;
 import com.maxsavteam.ciconia.CiconiaApplication;
 import com.maxsavteam.ciconia.annotation.Configuration;
+import com.maxsavteam.ciconia.exception.CiconiaRuntimeException;
+import com.maxsavteam.ciconia.sparkjava.CiconiaExceptionHandler;
+import com.maxsavteam.ciconia.sparkjava.CiconiaSparkApplication;
+import com.maxsavteam.ciconia.sparkjava.CiconiaSparkConfiguration;
 import org.apache.commons.lang3.SystemUtils;
 import oshi.SystemInfo;
+import spark.Request;
+import spark.Response;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -35,40 +40,45 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws IOException {
-		if(args.length > 0 && args[0].equals("help")){
+		if (args.length > 0 && args[0].equals("help")) {
 			System.out.println(Utils.getHelpString());
 			return;
 		}
 
 		programArguments = ProgramArgumentsParser.parse(args);
 
-		if(programArguments.getMailPropertiesFile() != null)
+		if (programArguments.getMailPropertiesFile() != null)
 			MailSender.init(programArguments.getMailPropertiesFile());
 
-		CiconiaApplication.run(Main.class);
+		CiconiaSparkConfiguration configuration = new CiconiaSparkConfiguration.Builder()
+				.setPort(programArguments.getApiPort())
+				.setExceptionHandler((exception, request, response) -> exception.printStackTrace())
+				.build();
+
+		CiconiaSparkApplication.run(Main.class, configuration);
 
 		String afterStartupCommand = programArguments.getAfterStartupCommand();
-		if(afterStartupCommand != null && !afterStartupCommand.isEmpty()){
+		if (afterStartupCommand != null && !afterStartupCommand.isEmpty()) {
 			Utils.exec(afterStartupCommand);
 		}
 	}
 
-	public static SystemInfoProvider getSystemInfoProvider(){
-		if(SystemUtils.IS_OS_LINUX)
+	public static SystemInfoProvider getLocalSystemInfoProvider() {
+		if (SystemUtils.IS_OS_LINUX)
 			return new LinuxSystemInfoProvider();
 		return new DefaultSystemInfoProvider();
 	}
 
-	public static List<ServicesStatsTask.Service> getServicesFromFile(String path){
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(path))))){
+	public static List<ServicesStatsTask.Service> getServicesFromFile(String path) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(Paths.get(path))))) {
 			List<ServicesStatsTask.Service> services = new ArrayList<>();
 			String content = reader.readLine();
 			int lineIndex = 1;
-			while(content != null){
-				if(content.isEmpty() || content.startsWith("#"))
+			while (content != null) {
+				if (content.isEmpty() || content.startsWith("#"))
 					continue;
 				int p = content.indexOf(':');
-				if(p == -1){
+				if (p == -1) {
 					throw new IllegalArgumentException("Illegal format (should be `id:name`) at content " + lineIndex);
 				}
 				String serviceId = content.substring(0, p);
@@ -79,7 +89,7 @@ public class Main {
 				lineIndex++;
 			}
 			return services;
-		}catch (IOException e){
+		} catch (IOException e) {
 			e.printStackTrace();
 			return Collections.emptyList();
 		}

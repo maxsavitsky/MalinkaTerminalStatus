@@ -43,3 +43,11 @@ Arguments:
         - pass - password
         - recipients-list - comma-separated list of recipients
         - smtp-host - smtp host which will be used for mail sending (e.g. smtp.gmail.com)
+
+    --source=<path>
+        Can be "local" (information from local computer will be displayed) or "<ip>:<port>" (information from remote computer will be displayed)
+        Default is "local"
+
+    --api-port=<port>
+        Specifies port under which system information will be available via REST API
+        Default is 22800
