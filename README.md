@@ -14,8 +14,8 @@ On Linux you can also specify services which status will be displayed (see help 
 ```console
 $ git clone https://github.com/maxsavitsky/MalinkaTerminalStatus.git
 $ cd MalinkaTerminalStatus
-$ mvn package
-$ java -jar target\MalinkaTerminalStatus-1.0-shaded.jar
+$ gradlew build
+$ java -jar build/libs/archive.jar
 ```
 
 ## Help
