@@ -33,7 +33,10 @@ Arguments:
         This file describes the services whose status should be displayed.
         Each service is described by a separate content in the format id:name
         id should be identifier of service in systemctl
-        Note: Works only on linux
+        name is a name of service which will be displayed in terminal
+        If source is not "local", then value "from-remote" can be specified.
+        In that case services list will be downloaded from remote host. (on server services should be declared in "services-list.txt" file in directory with jar-file in "id:name" format)
+        Note: local services works only on Linux
 
     --mail-properties=<path>
         File describes mail configuration in key=value format.
