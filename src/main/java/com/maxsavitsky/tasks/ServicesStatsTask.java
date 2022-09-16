@@ -2,7 +2,7 @@ package com.maxsavitsky.tasks;
 
 import com.maxsavitsky.Content;
 import com.maxsavitsky.manager.ContentDispatcher;
-import com.maxsavitsky.tasks.provider.service.ServiceInfoProvider;
+import com.maxsavitsky.tasks.provider.service.ServicesInfoProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 public class ServicesStatsTask extends Task {
 
 	private final ContentDispatcher contentDispatcher;
-	private final ServiceInfoProvider serviceInfoProvider;
+	private final ServicesInfoProvider servicesInfoProvider;
 	private final List<Service> services;
 	private final List<String> servicesIds;
 
-	public ServicesStatsTask(ContentDispatcher contentDispatcher, ServiceInfoProvider serviceInfoProvider, List<Service> services) {
+	public ServicesStatsTask(ContentDispatcher contentDispatcher, ServicesInfoProvider servicesInfoProvider, List<Service> services) {
 		this.contentDispatcher = contentDispatcher;
-		this.serviceInfoProvider = serviceInfoProvider;
+		this.servicesInfoProvider = servicesInfoProvider;
 		this.services = services;
 		this.servicesIds = services
 				.stream()
@@ -28,15 +28,15 @@ public class ServicesStatsTask extends Task {
 
 	@Override
 	public void execute() throws IOException {
-		serviceInfoProvider.fetch(servicesIds);
+		servicesInfoProvider.fetch(servicesIds);
 
 		List<Content> contents = new ArrayList<>();
 		for(Service service : services){
 			contents.add(
 					new Content(
 							service.getId(),
-							"services",
-							serviceInfoProvider.getServiceStatus(service.getId()),
+							"sys-stat",
+							servicesInfoProvider.getServiceStatus(service.getId()),
 							service.getName()
 					)
 			);

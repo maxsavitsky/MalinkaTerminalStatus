@@ -1,0 +1,2 @@
+call f:\malinka_scripts\upload_orangepi.bat F:\JavaProjects\MalinkaTerminalStatus\build\libs\archive.jar /terminal-status/terminal-status.jar
+call f:\malinka_scripts\restart-service_orangepi.bat term-status

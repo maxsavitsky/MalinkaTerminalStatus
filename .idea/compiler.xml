@@ -14,6 +14,8 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="connector" target="1.8" />
+      <module name="connector.main" target="1.8" />
+      <module name="connector.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

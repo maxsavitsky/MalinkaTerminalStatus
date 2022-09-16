@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
-public class LinuxServicesInfoProvider implements ServiceInfoProvider {
+public class LinuxServicesInfoProvider implements ServicesInfoProvider {
 
 	@Override
 	public String getServiceStatus(String serviceId) throws IOException {

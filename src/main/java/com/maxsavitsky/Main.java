@@ -1,19 +1,17 @@
 package com.maxsavitsky;
 
 import com.maxsavitsky.tasks.ServicesStatsTask;
+import com.maxsavitsky.tasks.provider.service.DefaultServicesInfoProvider;
+import com.maxsavitsky.tasks.provider.service.LinuxServicesInfoProvider;
+import com.maxsavitsky.tasks.provider.service.ServicesInfoProvider;
 import com.maxsavitsky.tasks.provider.system.DefaultSystemInfoProvider;
 import com.maxsavitsky.tasks.provider.system.LinuxSystemInfoProvider;
 import com.maxsavitsky.tasks.provider.system.SystemInfoProvider;
-import com.maxsavteam.ciconia.CiconiaApplication;
 import com.maxsavteam.ciconia.annotation.Configuration;
-import com.maxsavteam.ciconia.exception.CiconiaRuntimeException;
-import com.maxsavteam.ciconia.sparkjava.CiconiaExceptionHandler;
 import com.maxsavteam.ciconia.sparkjava.CiconiaSparkApplication;
 import com.maxsavteam.ciconia.sparkjava.CiconiaSparkConfiguration;
 import org.apache.commons.lang3.SystemUtils;
 import oshi.SystemInfo;
-import spark.Request;
-import spark.Response;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -67,6 +65,12 @@ public class Main {
 		if (SystemUtils.IS_OS_LINUX)
 			return new LinuxSystemInfoProvider();
 		return new DefaultSystemInfoProvider();
+	}
+
+	public static ServicesInfoProvider getLocalServicesInfoProvider() {
+		if (SystemUtils.IS_OS_LINUX)
+			return new LinuxServicesInfoProvider();
+		return new DefaultServicesInfoProvider();
 	}
 
 	public static List<ServicesStatsTask.Service> getServicesFromFile(String path) {
