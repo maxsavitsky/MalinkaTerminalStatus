@@ -7,6 +7,7 @@ import org.apache.commons.validator.routines.InetAddressValidator;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class NetworkSource implements Source {
 
@@ -16,7 +17,9 @@ public class NetworkSource implements Source {
 	public NetworkSource(String source, int port) {
 		validate(source, port);
 		address = "http://" + source + ":" + port;
-		httpClient = new OkHttpClient.Builder().build();
+		httpClient = new OkHttpClient.Builder()
+				.connectTimeout(5, TimeUnit.SECONDS)
+				.build();
 	}
 
 	public String request(String path) throws IOException {

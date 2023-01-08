@@ -3,6 +3,7 @@ package com.maxsavitsky;
 public class Content {
 
 	public static final String DELIMITER = "~#";
+	public static final String ERROR_TAG = "ERROR";
 
 	private final String tag;
 	private final String sectionId;

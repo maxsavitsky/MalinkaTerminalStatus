@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 public class SystemStatusSection extends Section {
 
+	public static final String ERROR_TAG = "ERROR";
+
 	private final ArrayList<Content> contents = new ArrayList<>();
 
 	@Override
@@ -38,32 +40,41 @@ public class SystemStatusSection extends Section {
 	}
 
 	@Override
-	public void write(Content line, Terminal terminal) throws IOException {
-		if (line.getMessage() == null)
+	public void write(Content content, Terminal terminal) throws IOException {
+
+		if(content.getTag().equals(ERROR_TAG)){
+			for(int i = 1; i < getLastDeclaredSize().getHeight(); i++)
+				clearLine(terminal, i);
+			terminal.setCursorPosition(new TerminalPosition(0, 1));
+			terminal.putString("ERROR: " + content.getMessage());
+		}
+
+		if (content.getMessage() == null)
 			throw new UnsupportedOperationException("Message is null");
 		int lineIndex = -1;
 		for (int i = 0; i < contents.size(); i++) {
-			if (contents.get(i).getTag().equals(line.getTag())) {
+			if (contents.get(i).getTag().equals(content.getTag())) {
 				lineIndex = i;
 				break;
 			}
 		}
 		if (lineIndex == -1) {
 			lineIndex = contents.size();
-			contents.add(line);
+			contents.add(content);
 		}
 
-		String content;
-		if (line.getLabel() != null && line.getMessage() != null) {
-			content = line.getLabel() + ": " + line.getMessage();
+		String s;
+		if (content.getLabel() != null && content.getMessage() != null) {
+			s = content.getLabel() + ": " + content.getMessage();
 		} else {
-			content = line.getLabel() == null ? line.getMessage() : line.getLabel();
+			s = content.getLabel() == null ? content.getMessage() : content.getLabel();
 		}
-		if(content.length() > getLastDeclaredSize().getWidth())
-			content = content.substring(0, getLastDeclaredSize().getWidth());
+		if(s.length() > getLastDeclaredSize().getWidth())
+			s = s.substring(0, getLastDeclaredSize().getWidth());
 
 		terminal.setCursorPosition(new TerminalPosition(0, lineIndex));
-		terminal.putString(content);
+		terminal.putString(s);
+		clearLine(terminal, getLastDeclaredSize().getWidth() - s.length());
 	}
 
 	private void rewrite(Terminal terminal) throws IOException {

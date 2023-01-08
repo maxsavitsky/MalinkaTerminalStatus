@@ -65,4 +65,11 @@ public abstract class Section {
 		}
 	}
 
+	public static boolean isInSection(int x, int y, Section.SectionSize sectionSize){
+		return x >= sectionSize.getX()
+				&& x < sectionSize.getX() + sectionSize.getWidth()
+				&& y >= sectionSize.getY()
+				&& y < sectionSize.getY() + sectionSize.getHeight();
+	}
+
 }
