@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class TempControlTask extends Task {
 
-	private static final int SHUTDOWN_TEMP = 80;
+	private static final int REBOOT_TEMP = 80;
 
 	private static final int NOTIFICATION_TEMP = 70;
 
@@ -50,13 +50,13 @@ public class TempControlTask extends Task {
 			lastTemperaturePrintTime = time;
 		}
 
-		if (temp >= SHUTDOWN_TEMP) {
-			System.out.println("TEMPERATURE IS HIGH THAN " + SHUTDOWN_TEMP + ". SHUTDOWN");
+		if (temp >= REBOOT_TEMP) {
+			System.out.println("TEMPERATURE IS HIGH THAN " + REBOOT_TEMP + ". REBOOT");
 			printMessage("Overheating! Temp: " + temp);
-			sendMail("OVERHEATING", "Temperature is " + temp + "C. Limit is " + SHUTDOWN_TEMP + "C. SHUTDOWN");
-			String shutdownCommand = getShutdownCommand();
+			sendMail("OVERHEATING", "Temperature is " + temp + "C. Limit is " + REBOOT_TEMP + "C. REBOOT");
+			String shutdownCommand = getRebootCommand();
 			if (shutdownCommand == null) {
-				printMessage("Cannot get shutdown command for current OS: " + SystemInfo.getCurrentPlatform());
+				printMessage("Cannot get reboot command for current OS: " + SystemInfo.getCurrentPlatform());
 			} else {
 				Utils.exec(shutdownCommand);
 				System.exit(0);
@@ -67,7 +67,7 @@ public class TempControlTask extends Task {
 		}
 	}
 
-	private String getShutdownCommand() {
+	private String getRebootCommand() {
 		switch (SystemInfo.getCurrentPlatform()) {
 			case OPENBSD:
 			case NETBSD:
@@ -78,7 +78,7 @@ public class TempControlTask extends Task {
 				return "shutdown -h now";
 			case WINDOWS:
 			case WINDOWSCE:
-				return "shutdown /s /f /t 5";
+				return "shutdown /r";
 			default:
 				return null;
 		}

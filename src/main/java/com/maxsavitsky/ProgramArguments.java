@@ -15,7 +15,7 @@ public class ProgramArguments {
 	private boolean enableTempControl = true;
 	private boolean enableServicesStats = true;
 	private String afterStartupCommand = null;
-	private String beforeShutdownCommand = null;
+	private String beforeRebootCommand = null;
 	private int port = 8000;
 	private int apiPort = 22800;
 	private int messagesBroadcastingPort = 22801;

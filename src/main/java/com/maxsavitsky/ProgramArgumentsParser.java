@@ -38,8 +38,8 @@ public class ProgramArgumentsParser {
 				programArguments.setAfterStartupCommand(
 						value
 				);
-			}else if(argName.equals("execute-before-shutdown")) {
-				programArguments.setBeforeShutdownCommand(
+			}else if(argName.equals("execute-before-reboot")) {
+				programArguments.setBeforeRebootCommand(
 						value
 				);
 			}else if(argName.equals("port")) {
